@@ -38,7 +38,7 @@ Parameters:
     Type: String
 
 Resources:
-# RDS MySQL Database Configuration
+#### RDS MySQL Database ###
   RdsMySqlSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:

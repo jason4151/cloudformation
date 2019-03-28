@@ -36,7 +36,7 @@ Parameters:
     Description: Amazon Machine Image ID
 
 Resources:
-# Salt Master EC2 Instance Configuration
+### EC2 ###
   SaltMasterEc2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -78,7 +78,7 @@ Resources:
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
 
-# S3 bucket
+### S3 ###
   SaltMasterS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -87,7 +87,7 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-#### CodeDeploy ###
+### CodeDeploy ###
   SaltMasterCodeDeployApplication:
     Type: AWS::CodeDeploy::Application
     Properties:
@@ -109,7 +109,7 @@ Resources:
       ServiceRoleArn: 
         Fn::GetAtt: [ SaltMasterRole, Arn ]  
 
-# Route 53
+### Route 53 ###
   # SaltMasterDnsRecord:
   #   Type: AWS::Route53::RecordSet
   #   DependsOn: SaltMasterPublicAlb

@@ -36,7 +36,7 @@ Parameters:
     Description: Amazon Machine Image ID
 
 Resources:
-# Windows Bastion EC2 Instance Configuration
+### EC2 ###
   WindowsBastionEc2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -58,7 +58,6 @@ Resources:
           Value: !Ref 'Service'
         - Key: Owner
           Value: !Ref 'Owner'
-      
 
 ### Security Groups ###
   WindowsBastionEc2SecurityGroup:
