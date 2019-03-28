@@ -1,0 +1,119 @@
+# AWS CLI deployment command
+# Execute the following command from the cfn directory:
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://cfn/mysql-rds.yml --parameters file://cfn/params/mysql-rds-params-us-east-1-cis.json
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  This template creates a RDS MySQL Database for the CIS-5898 Capstone project.
+
+Parameters:
+  DeploymentId:
+    Type: String
+    Description: A unique deployment identifier.
+
+  Owner:
+    Type: String
+    Description: Email address of the person that created the stack.
+
+  Service:
+    Type: String
+    Description: Name of the service or product that is associated with this stack.
+
+  RdsMySqlDatabaseName:
+    Type: String
+    Description: RDS database name.
+
+  RdsMySqlMasterUsername:
+    Type: String
+    Description: Master username for RDS.
+
+  RdsMySqlMasterUserPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for RDS master user.
+
+  RdsMySqlInstanceType:
+    Description: RDS EC2 instance type
+    Type: String
+
+Resources:
+# RDS MySQL Database Configuration
+  RdsMySqlSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: EES RDS Subnet Group
+      SubnetIds:
+        - !ImportValue 'DatabaseSubnetAz1'
+        - !ImportValue 'DatabaseSubnetAz2'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Service}-rds-${DeploymentId}
+        - Key: Service
+          Value: !Ref 'Service'
+        - Key: Owner
+          Value: !Ref 'Owner'
+
+  RdsMySqlSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS Security Group
+      VpcId: !ImportValue 'VpcId'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Service}-rds-${DeploymentId}
+        - Key: Service
+          Value: !Ref 'Service'
+        - Key: Owner
+          Value: !Ref 'Owner'
+
+  RdsMySqlSecurityGroup3306Inbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'RdsMySqlSecurityGroup'
+      IpProtocol: tcp
+      FromPort: '3306'
+      ToPort: '3306'
+      CidrIp: 10.19.0.0/24
+
+  RdsMySqlDbInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: !Ref 'RdsMySqlInstanceType'
+      DBInstanceIdentifier: !Join ['-', [ !Ref 'Service', rds, !Ref 'AWS::Region', !Ref 'DeploymentId']]
+      DBName: !Ref 'RdsMySqlDatabaseName'
+      DBSubnetGroupName: !Ref 'RdsMySqlSubnetGroup'
+      Engine: mysql
+      EngineVersion: 5.6.40
+      MasterUsername: !Ref 'RdsMySqlMasterUsername'
+      MasterUserPassword: !Ref 'RdsMySqlMasterUserPassword'
+      MultiAZ: true
+      PreferredBackupWindow: 06:00-06:30
+      PreferredMaintenanceWindow: Wed:07:00-Wed:08:00
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      StorageType: gp2
+      Tags:
+        - Key: Name
+          Value: !Sub ${Service}-rds-${DeploymentId}
+        - Key: Service
+          Value: !Ref 'Service'
+        - Key: Owner
+          Value: !Ref 'Owner'
+      VPCSecurityGroups:
+        - !Ref 'RdsMySqlSecurityGroup'
+
+Outputs:
+  RdsMySqlDbInstanceUrl:
+    Description: RDS MySQL Database URL
+    Value: !GetAtt [RdsMySqlDbInstance, Endpoint.Address]
+    Export:
+      Name: RdsMySqlDbInstanceUrl
+
+  RdsMySqlDbName:
+    Description: RDS  Engine Database Name
+    Value: !Ref 'RdsMySqlDatabaseName'
+    Export:
+      Name: RdsMySqlDbName

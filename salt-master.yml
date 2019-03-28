@@ -1,0 +1,274 @@
+# AWS CLI deployment command
+# Execute the following command from the cfn directory:
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-cis --template-body file://cfn/salt-master.yml --parameters file://cfn/params/salt-master-params-us-east-1-cis.json
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  This template creates a Salt Master EC2 instance for the CIS-5898 Capstone project.
+
+Parameters:
+  DeploymentId:
+    Type: String
+    Description: A unique deployment identifier.
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 KeyPair to enable SSH access to the ECS instances.
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small, t2.medium, t2.large]
+    ConstraintDescription: Please choose a valid instance type.
+
+  Service:
+    Type: String
+    Description: Name of the service or product that is associated with this stack.
+
+  Owner:
+    Type: String
+    Description: Email address of the person that created the stack.
+
+  AmiId:
+    Type: String
+    Description: Amazon Machine Image ID
+
+Resources:
+# Salt Master EC2 Instance Configuration
+  SaltMasterEc2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref 'AmiId'
+      InstanceType: !Ref 'InstanceType'
+      SubnetId: !ImportValue 'MgmtSubnetAz1'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds: [!Ref 'SaltMasterEc2SecurityGroup']
+      IamInstanceProfile: !Ref 'SaltMasterInstanceProfile'
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: '50'
+            VolumeType: 'gp2'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Service}-${DeploymentId}
+        - Key: Service
+          Value: !Ref 'Service'
+        - Key: Owner
+          Value: !Ref 'Owner'
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            # Install AWS Tools
+            wget https://aws-codedeploy-${AWS::Region}.s3.amazonaws.com/latest/install
+            chmod +x ./install
+            yum -y install ruby
+            ./install auto
+            yum install -y aws-cfn-bootstrap
+            # Install Salt Master
+            yum install -y https://repo.saltstack.com/yum/amazon/salt-amzn2-repo-latest.amzn2.noarch.rpm
+            yum install -y salt-master
+            systemctl enable salt-master.service
+            echo 'role: salt-master' >> /etc/salt/grains
+            systemctl start salt-master.service
+            # Send CloudFormation Signals
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
+
+# S3 bucket
+  SaltMasterS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
+      VersioningConfiguration:
+        Status: Enabled
+
+#### CodeDeploy ###
+  SaltMasterCodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: !Sub ${Service}-${DeploymentId}	    
+      ComputePlatform: Server
+
+  SaltMasterCodeDeployDeploymentGroup: 
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties: 
+      ApplicationName: !Ref 'SaltMasterCodeDeployApplication'
+      AutoRollbackConfiguration:
+        Enabled: 'true'
+        Events:
+          - DEPLOYMENT_FAILURE
+      Ec2TagFilters:
+        - Key: Service
+          Value: !Ref 'Service'
+          Type: KEY_AND_VALUE
+      ServiceRoleArn: 
+        Fn::GetAtt: [ SaltMasterRole, Arn ]  
+
+# Route 53
+  # SaltMasterDnsRecord:
+  #   Type: AWS::Route53::RecordSet
+  #   DependsOn: SaltMasterPublicAlb
+  #   Properties:
+  #     HostedZoneName: !Ref 'HostedZoneName'
+  #     Comment: DNS name for SaltMaster instance.
+  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
+  #     Type: CNAME
+  #     TTL: '300'
+  #     ResourceRecords:
+  #     - !GetAtt SaltMasterPublicAlb.DNSName
+
+  # SaltMasterInternalDnsRecord:
+  #   Type: AWS::Route53::RecordSet
+  #   DependsOn: SaltMasterEc2Instance
+  #   Properties:
+  #     HostedZoneName: !Ref 'HostedZoneInternalName'
+  #     Comment: DNS name for SaltMaster instance.
+  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'AWS::Region', ., !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
+  #     Type: CNAME
+  #     TTL: '300'
+  #     ResourceRecords:
+  #     - !GetAtt SaltMasterEc2Instance.PrivateDnsName
+
+### Security Groups ###
+  SaltMasterEc2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SaltMaster Security Group
+      VpcId: !ImportValue 'VpcId'
+      Tags:
+        - Key: Service
+          Value: salt-master
+        - Key: Name
+          Value: salt-master-ec2-sg
+
+# Allow SSH port 22 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroupSshInbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: 10.19.0.0/24
+
+# Allow port 4505 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroup4505Inbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '4505'
+      ToPort: '4505'
+      CidrIp: 10.19.0.0/24
+
+# Allow port 4506 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroup4505Inbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '4506'
+      ToPort: '4506'
+      CidrIp: 10.19.0.0/24
+
+### IAM Role & Policies ###
+  SaltMasterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - codedeploy.amazonaws.com
+            Action:
+                - sts:AssumeRole
+      Path: /
+
+# Allow Salt Master service access to S3 Bucket
+  SaltMasterS3AccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SaltMasterS3AccessPolicy
+      Roles:
+        - !Ref 'SaltMasterRole'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource: !Sub 'arn:aws:s3:::${SaltMasterS3Bucket}/*'
+
+# Allow Salt Master service access to Assume IAM roles
+  SaltMasterAssumeRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SaltMasterAssumeRolePolicy
+      Roles:
+        - !Ref 'SaltMasterRole'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Resource:
+              - '*'
+
+# Allow Salt Master service access to CloudWatch
+  SaltMasterCloudWatchPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SaltMasterCloudWatchPolicy
+      Roles:
+        - !Ref 'SaltMasterRole'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:ListMetrics
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:PutMetricData
+            Resource: '*'
+
+# Allow CodeDeploy service to perforam actions on Salt Master 
+  SaltMasterCodeDeployPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SaltMasterCodeDeployPolicy
+      Roles:
+        - !Ref 'SaltMasterRole'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:PutMetricAlarm
+              - ec2:Describe*
+              - sns:Publish
+              - tag:GetTags
+              - tag:GetResources
+            Resource:
+              - '*'
+
+# Salt Master EC2 Instance profile for which the Salt Master IAM role is associated
+  SaltMasterInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'SaltMasterRole'
+
+Outputs:
+  SaltMasterEc2InstancePrivateDnsName:
+     Value: !GetAtt SaltMasterEc2Instance.PrivateDnsName

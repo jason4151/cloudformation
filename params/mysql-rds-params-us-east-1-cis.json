@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "DeploymentId",
+    "ParameterValue": "cis"
+  },  
+  {
+    "ParameterKey": "RdsMySqlInstanceType",
+    "ParameterValue": "db.t2.micro"
+  },
+  {
+    "ParameterKey": "RdsMySqlDatabaseName",
+    "ParameterValue": "capstone"
+  },
+  {
+    "ParameterKey": "RdsMysqlMasterUsername",
+    "ParameterValue": "jmoskowitz"
+  },
+  {
+    "ParameterKey": "RdsMysqlMasterUserPassword",
+    "ParameterValue": "8L&6dW&1*{A(dIlF"
+  }
+]

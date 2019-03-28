@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "VpcName",
+    "ParameterValue": "vpc-19-us-east-1-cis"
+  },
+  {
+    "ParameterKey": "SupernetNumber",
+    "ParameterValue": "19"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "us-east-1a,us-east-1b"
+  },
+  {
+    "ParameterKey": "DhcpDnsDomain",
+    "ParameterValue": "moskowitz.int"
+  },
+  {
+    "ParameterKey": "SnsEmail",
+    "ParameterValue": "jmoskowitz2017@my.fit.edu"
+  }
+]
