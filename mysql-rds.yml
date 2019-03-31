@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://cfn/mysql-rds.yml --parameters file://cfn/params/mysql-rds-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://capstone-cfn/mysql-rds.yml --parameters file://capstone-cfn/params/mysql-rds-params-us-east-1-cis.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -24,14 +24,14 @@ Parameters:
     Type: String
     Description: RDS database name.
 
-  RdsMySqlMasterUsername:
-    Type: String
-    Description: Master username for RDS.
+  # RdsMySqlMasterUsername:
+  #   Type: String
+  #   Description: Master username for RDS.
 
-  RdsMySqlMasterUserPassword:
-    Type: String
-    NoEcho: true
-    Description: Password for RDS master user.
+  # RdsMySqlMasterUserPassword:
+  #   Type: String
+  #   NoEcho: true
+  #   Description: Password for RDS master user.
 
   RdsMySqlInstanceType:
     Description: RDS EC2 instance type
@@ -87,13 +87,15 @@ Resources:
       DBSubnetGroupName: !Ref 'RdsMySqlSubnetGroup'
       Engine: mysql
       EngineVersion: 5.6.40
-      MasterUsername: !Ref 'RdsMySqlMasterUsername'
-      MasterUserPassword: !Ref 'RdsMySqlMasterUserPassword'
+      #MasterUsername: !Ref 'RdsMySqlMasterUsername'
+      #MasterUserPassword: !Ref 'RdsMySqlMasterUserPassword'
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:password}}' ]]      
       MultiAZ: true
       PreferredBackupWindow: 06:00-06:30
       PreferredMaintenanceWindow: Wed:07:00-Wed:08:00
       PubliclyAccessible: false
-      StorageEncrypted: true
+      StorageEncrypted: false
       StorageType: gp2
       Tags:
         - Key: Name
@@ -104,6 +106,31 @@ Resources:
           Value: !Ref 'Owner'
       VPCSecurityGroups:
         - !Ref 'RdsMySqlSecurityGroup'
+
+### Secrets Manager ###
+  RdsMySqlDbSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: "Dynamically generated secret password."
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: Name
+          Value: !Sub ${Service}-rds-${DeploymentId}
+        - Key: Service
+          Value: !Ref 'Service'
+        - Key: Owner
+          Value: !Ref 'Owner'
+
+  SecretRDSInstanceAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref RdsMySqlDbSecret
+      TargetId: !Ref RdsMySqlDbInstance
+      TargetType: AWS::RDS::DBInstance
 
 Outputs:
   RdsMySqlDbInstanceUrl:

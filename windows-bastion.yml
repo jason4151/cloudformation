@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name windows-bastion-us-east-1-cis --template-body file://cfn/windows-bastion.yml --parameters file://cfn/params/windows-bastion-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name windows-bastion-us-east-1-cis --template-body file://capstone-cfn/windows-bastion.yml --parameters file://capstone-cfn/params/windows-bastion-params-us-east-1-cis.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-cis --template-body file://cfn/salt-master.yml --parameters file://cfn/params/salt-master-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-cis --template-body file://capstone-cfn/salt-master.yml --parameters file://capstone-cfn/params/salt-master-params-us-east-1-cis.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

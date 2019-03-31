@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-us-east-1-cis --template-body file://cfn/web-server.yml --parameters file://cfn/params/web-server-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-params-us-east-1-cis.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -42,7 +42,7 @@ Resources:
     Properties:
       ImageId: !Ref 'AmiId'
       InstanceType: !Ref 'InstanceType'
-      SubnetId: !ImportValue 'MgmtSubnetAz1'
+      SubnetId: !ImportValue 'PublicSubnetAz1'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds: [!Ref 'WebServerEc2SecurityGroup']
       IamInstanceProfile: !Ref 'WebServerInstanceProfile'
@@ -73,7 +73,7 @@ Resources:
             yum clean expire-cache
             yum install -y salt-minion
             systemctl enable salt-minion.service
-            echo 'role: web-server' >> /etc/salt/grains
+            echo 'role:web-server' >> /etc/salt/grains
             systemctl start salt-minion.service
             # Send CloudFormation Signals
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
@@ -87,6 +87,28 @@ Resources:
       BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
       VersioningConfiguration:
         Status: Enabled
+
+### CodeDeploy ###
+  WebServerCodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: !Sub ${Service}-${DeploymentId}	    
+      ComputePlatform: Server
+
+  WebServerCodeDeployDeploymentGroup: 
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties: 
+      ApplicationName: !Ref 'WebServerCodeDeployApplication'
+      AutoRollbackConfiguration:
+        Enabled: 'true'
+        Events:
+          - DEPLOYMENT_FAILURE
+      Ec2TagFilters:
+        - Key: Service
+          Value: !Ref 'Service'
+          Type: KEY_AND_VALUE
+      ServiceRoleArn: 
+        Fn::GetAtt: [ WebServerRole, Arn ]  
 
 ### Route 53 ###
   # WebServerDnsRecord:
@@ -131,8 +153,8 @@ Resources:
     Properties:
       GroupId: !Ref 'WebServerEc2SecurityGroup'
       IpProtocol: tcp
-      FromPort: '8080'
-      ToPort: '8080'
+      FromPort: '80'
+      ToPort: '80'
       CidrIp: 10.19.0.0/24
 
 # Allow SSH port 22 access to WebServer EC2 instance from VPC addresses
@@ -208,6 +230,27 @@ Resources:
               - cloudwatch:GetMetricStatistics
               - cloudwatch:PutMetricData
             Resource: '*'
+
+# Allow CodeDeploy service to perforam actions on Web Server 
+  WebServerCodeDeployPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: WebServerCodeDeployPolicy
+      Roles:
+        - !Ref 'WebServerRole'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:PutMetricAlarm
+              - ec2:Describe*
+              - sns:Publish
+              - tag:GetTags
+              - tag:GetResources
+            Resource:
+              - '*'
 
 # Web Server EC2 Instance profile for which the Web Server IAM role is associated
   WebServerInstanceProfile:
