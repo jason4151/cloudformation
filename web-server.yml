@@ -73,7 +73,7 @@ Resources:
             yum clean expire-cache
             yum install -y salt-minion
             systemctl enable salt-minion.service
-            echo 'role:web-server' >> /etc/salt/grains
+            echo 'role: web-server' >> /etc/salt/grains
             systemctl start salt-minion.service
             # Send CloudFormation Signals
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
