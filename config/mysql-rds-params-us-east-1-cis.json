@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "DeploymentId",
+    "ParameterValue": "cis"
+  },
+  {
+    "ParameterKey": "Service",
+    "ParameterValue": "mysql"
+  },
+  {
+    "ParameterKey": "Owner",
+    "ParameterValue": "jmoskowitz2017@my.fit.edu"
+  },
+  {
+    "ParameterKey": "RdsMySqlInstanceType",
+    "ParameterValue": "db.t2.micro"
+  },
+  {
+    "ParameterKey": "RdsMySqlDatabaseName",
+    "ParameterValue": "capstone"
+  }
+]
