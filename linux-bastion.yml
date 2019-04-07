@@ -23,6 +23,11 @@ Parameters:
     Type: String
     Default: t2.micro
 
+  HostedZoneName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Name.
+    Default: moskowitz.sh.
+
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
@@ -81,6 +86,25 @@ Resources:
             # Send CloudFormation Signals
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
+
+### EC2 EIP ###
+  LinuxBastionEc2Eip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref 'LinuxBastionEc2Instance'
+
+### Route 53 ###
+  LinuxBastionDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref 'HostedZoneName'
+      Comment: DNS name for Linux Bastion instance.
+      Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
+      Type: A
+      TTL: '300'
+      ResourceRecords:
+      - !Ref 'LinuxBastionEc2Eip'
 
 ### Security Groups ###
   LinuxBastionEc2SecurityGroup:

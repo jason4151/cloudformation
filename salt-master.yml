@@ -23,6 +23,11 @@ Parameters:
     Type: String
     Default: t2.micro
 
+  HostedZoneInternalName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Internal Name.
+    Default: moskowitz.int.
+
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
@@ -113,29 +118,17 @@ Resources:
         Fn::GetAtt: [ SaltMasterRole, Arn ]  
 
 ### Route 53 ###
-  # SaltMasterDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   DependsOn: SaltMasterPublicAlb
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneName'
-  #     Comment: DNS name for SaltMaster instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt SaltMasterPublicAlb.DNSName
-
-  # SaltMasterInternalDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   DependsOn: SaltMasterEc2Instance
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneInternalName'
-  #     Comment: DNS name for SaltMaster instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'AWS::Region', ., !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt SaltMasterEc2Instance.PrivateDnsName
+  SaltMasterInternalDnsRecord:
+    Type: AWS::Route53::RecordSet
+    DependsOn: SaltMasterEc2Instance
+    Properties:
+      HostedZoneName: !Ref 'HostedZoneInternalName'
+      Comment: DNS name for SaltMaster instance.
+      Name: !Join ['', [salt, ., !Ref 'HostedZoneInternalName']]
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+      - !GetAtt SaltMasterEc2Instance.PrivateDnsName
 
 ### Security Groups ###
   SaltMasterEc2SecurityGroup:

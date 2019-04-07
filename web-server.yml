@@ -23,10 +23,15 @@ Parameters:
     Type: String
     Default: t2.micro
 
+  HostedZoneName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Name.
+    Default: moskowitz.sh.
+    
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
-    Default: web-server
+    Default: web-server-prod
 
   Owner:
     Type: String
@@ -82,6 +87,13 @@ Resources:
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
 
+### EC2 EIP ###
+  WebServerEc2Eip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref 'WebServerEc2Instance'
+
 ### S3 ###
   WebServerS3Bucket:
     Type: AWS::S3::Bucket
@@ -114,17 +126,16 @@ Resources:
         Fn::GetAtt: [ WebServerRole, Arn ]  
 
 ### Route 53 ###
-  # WebServerDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   DependsOn: WebServerPublicAlb
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneName'
-  #     Comment: DNS name for WebServer instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt WebServerPublicAlb.DNSName
+  WebServerDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref 'HostedZoneName'
+      Comment: DNS name for Web Server instance.
+      Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
+      Type: A
+      TTL: '300'
+      ResourceRecords:
+      - !Ref 'WebServerEc2Eip'
 
   # WebServerInternalDnsRecord:
   #   Type: AWS::Route53::RecordSet

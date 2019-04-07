@@ -3,6 +3,7 @@
     "KeyName" : "capstone",
     "DeploymentId" : "cis-test",
     "Service" : "web-server-test",
+    "HostedZoneName" : "moskowitz.sh",
     "Owner" : "jmoskowitz2017@my.fit.edu",
     "AmiId" : "ami-0b8d0d6ac70e5750c"
   }   
