@@ -1,11 +1,11 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://capstone-cfn/windows-bastion.yml
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://capstone-cfn/linux-bastion.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a Amazon Linux Bastion EC2 instance for the CIS-5898 Capstone project.
+  This template creates a Linux Bastion EC2 instance for the CIS-5898 Capstone project.
 
 Parameters:
   DeploymentId:
@@ -40,19 +40,19 @@ Parameters:
 
 Resources:
 ### EC2 ###
-  WindowsBastionEc2Instance:
+  LinuxBastionEc2Instance:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref 'AmiId'
       InstanceType: !Ref 'InstanceType'
       SubnetId: !ImportValue 'PublicSubnetAz1'
       KeyName: !Ref 'KeyName'
-      SecurityGroupIds: [!Ref 'WindowsBastionEc2SecurityGroup']
-      IamInstanceProfile: !Ref 'WindowsBastionInstanceProfile'
+      SecurityGroupIds: [!Ref 'LinuxBastionEc2SecurityGroup']
+      IamInstanceProfile: !Ref 'LinuxBastionInstanceProfile'
       BlockDeviceMappings:
-        - DeviceName: /dev/sda1
+        - DeviceName: /dev/xvda
           Ebs:
-            VolumeSize: '50'
+            VolumeSize: '20'
             VolumeType: 'gp2'
       Tags:
         - Key: Name
@@ -83,29 +83,29 @@ Resources:
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
 
 ### Security Groups ###
-  WindowsBastionEc2SecurityGroup:
+  LinuxBastionEc2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: WindowsBastion Security Group
+      GroupDescription: LinuxBastion Security Group
       VpcId: !ImportValue 'VpcId'
       Tags:
         - Key: Service
-          Value: windows-bastion
+          Value: Linux-bastion
         - Key: Name
-          Value: windows-bastion-ec2-sg
+          Value: Linux-bastion-ec2-sg
 
-# Allow RDP port 3389 access to Windows Bastion EC2 instance from specific addresses
-  WindowsBastionEc2SecurityGroupSshInbound:
+# Allow SSH port 22 access to Linux Bastion EC2 instance from specific addresses
+  LinuxBastionEc2SecurityGroupSshInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      GroupId: !Ref 'WindowsBastionEc2SecurityGroup'
+      GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
       IpProtocol: tcp
-      FromPort: '3389'
-      ToPort: '3389'
+      FromPort: '22'
+      ToPort: '22'
       CidrIp: 50.89.175.153/32
 
 ### IAM Role & Policies ###
-  WindowsBastionRole:
+  LinuxBastionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -119,13 +119,13 @@ Resources:
                 - sts:AssumeRole
       Path: /
 
-# Allow Windows Bastion service access to Assume IAM roles
-  WindowsBastionAssumeRolePolicy:
+# Allow Linux Bastion service access to Assume IAM roles
+  LinuxBastionAssumeRolePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WindowsBastionAssumeRolePolicy
+      PolicyName: LinuxBastionAssumeRolePolicy
       Roles:
-        - !Ref 'WindowsBastionRole'
+        - !Ref 'LinuxBastionRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -135,13 +135,13 @@ Resources:
             Resource:
               - '*'
 
-# Allow Windows Bastion service access to CloudWatch
-  WindowsBastionCloudWatchPolicy:
+# Allow Linux Bastion service access to CloudWatch
+  LinuxBastionCloudWatchPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WindowsBastionCloudWatchPolicy
+      PolicyName: LinuxBastionCloudWatchPolicy
       Roles:
-        - !Ref 'WindowsBastionRole'
+        - !Ref 'LinuxBastionRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -152,14 +152,14 @@ Resources:
               - cloudwatch:PutMetricData
             Resource: '*'
 
-# Windows Bastion EC2 Instance profile for which the Windows Bastion IAM role is associated
-  WindowsBastionInstanceProfile:
+# Linux Bastion EC2 Instance profile for which the Linux Bastion IAM role is associated
+  LinuxBastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - !Ref 'WindowsBastionRole'
+        - !Ref 'LinuxBastionRole'
 
 ### Outputs:
-  # WindowsBastionEc2InstancePrivateDnsName:
-  #   Value: !GetAtt WindowsBastionEc2Instance.PrivateDnsName
+  # LinuxBastionEc2InstancePrivateDnsName:
+  #   Value: !GetAtt LinuxBastionEc2Instance.PrivateDnsName
