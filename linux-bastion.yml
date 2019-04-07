@@ -114,9 +114,9 @@ Resources:
       VpcId: !ImportValue 'VpcId'
       Tags:
         - Key: Service
-          Value: Linux-bastion
+          Value: linux-bastion
         - Key: Name
-          Value: Linux-bastion-ec2-sg
+          Value: linux-bastion-ec2-sg
 
 # Allow SSH port 22 access to Linux Bastion EC2 instance from specific addresses
   LinuxBastionEc2SecurityGroupSshInbound:
