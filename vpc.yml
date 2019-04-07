@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --stack-name vpc-19-us-east-1-cis --template-body file://capstone-cfn/vpc.yml --parameters file://capstone-cfn/params/vpc-19-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --stack-name vpc-19-us-east-1-cis --template-body file://capstone-cfn/vpc.yml
 
 # The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'

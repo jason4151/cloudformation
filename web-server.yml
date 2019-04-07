@@ -1,6 +1,6 @@
 # AWS CLI deployment command
 # Execute the following command from the cfn directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-params-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-us-east-1-cis --template-body file://capstone-cfn/web-server.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
