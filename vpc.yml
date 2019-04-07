@@ -19,6 +19,7 @@ Parameters:
     MaxLength: '30'
     AllowedPattern: '[a-zA-Z0-9-]+'
     ConstraintDescription: 1 to 30 lower case alphanumeric characters.
+    Default: vpc-19-us-east-1-cis
 
   SupernetNumber:
     Description: The value for the second octet 10.x.0.0/16 (65534 IPs).
@@ -26,18 +27,22 @@ Parameters:
     MinValue: '10'
     MaxValue: '250'
     ConstraintDescription: This must be a valid number between 10 and 250.
+    Default: '19'
 
   AvailabilityZones:
     Description: Choose two AZs to use in this region.
     Type: String
+    Default: us-east-1a,us-east-1b
 
   DhcpDnsDomain:
     Description: The DNS Domain Suffix for DHCP Scope.
     Type: String
+    Default: moskowitz.int
 
   SnsEmail:
     Description: An email address to send SNS notifications to.
     Type: String
+    Default: jmoskowitz2017@my.fit.edu
 
 # The Resource section specifies the resources and their properties deployed in the stack.
 Resources:
