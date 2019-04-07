@@ -11,31 +11,27 @@ Parameters:
   DeploymentId:
     Type: String
     Description: A unique deployment identifier.
+    Default: cis
 
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
+    Default: jmoskowitz2017@my.fit.edu
 
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
+    Default: mysql
 
   RdsMySqlDatabaseName:
     Type: String
     Description: RDS database name.
-
-  # RdsMySqlMasterUsername:
-  #   Type: String
-  #   Description: Master username for RDS.
-
-  # RdsMySqlMasterUserPassword:
-  #   Type: String
-  #   NoEcho: true
-  #   Description: Password for RDS master user.
-
+    Default: capstone
+    
   RdsMySqlInstanceType:
     Description: RDS EC2 instance type
     Type: String
+    Default: db.t2.micro
 
 Resources:
 #### RDS MySQL Database ###

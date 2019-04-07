@@ -11,29 +11,32 @@ Parameters:
   DeploymentId:
     Type: String
     Description: A unique deployment identifier.
+    Default: cis
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: EC2 KeyPair to enable SSH access to the ECS instances.
+    Default: capstone
 
   InstanceType:
     Description: EC2 instance type
     Type: String
     Default: t2.micro
-    AllowedValues: [t2.micro, t2.small, t2.medium, t2.large]
-    ConstraintDescription: Please choose a valid instance type.
 
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
+    Default: salt-master
 
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
+    Default: jmoskowitz2017@my.fit.edu
 
   AmiId:
     Type: String
     Description: Amazon Machine Image ID
+    Default: ami-0b8d0d6ac70e5750c
 
 Resources:
 ### EC2 ###
