@@ -83,8 +83,6 @@ Resources:
       DBSubnetGroupName: !Ref 'RdsMySqlSubnetGroup'
       Engine: mysql
       EngineVersion: 5.6.40
-      #MasterUsername: !Ref 'RdsMySqlMasterUsername'
-      #MasterUserPassword: !Ref 'RdsMySqlMasterUserPassword'
       MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:username}}' ]]
       MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:password}}' ]]      
       MultiAZ: true
