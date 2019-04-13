@@ -83,6 +83,7 @@ Resources:
             systemctl enable salt-minion.service
             echo 'role: linux-bastion' >> /etc/salt/grains
             systemctl start salt-minion.service
+            salt-call state.highstate
             # Send CloudFormation Signals
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
