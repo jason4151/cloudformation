@@ -10,7 +10,7 @@ Description: >
   This template creates a AWS VPC for the CIS-5898 Capstone project.
 
 # The Parameters section contains all of the values that are passed to the template at runtime.
-# Values are fed into the template via a parameters file.
+# Values can be set to a default or fed into the template via a parameters file or the CLI.
 Parameters:
   VpcName:
     Description: The VPC Name name.
@@ -44,8 +44,9 @@ Parameters:
     Type: String
     Default: jmoskowitz2017@my.fit.edu
 
-# The Resource section specifies the resources and their properties deployed in the stack.
+# The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
+### VPC ###
   Vpc:
     Type: AWS::EC2::VPC
     Properties:
@@ -751,155 +752,7 @@ Resources:
       SubnetId: !Ref 'DatabaseSubnetAz2'
       NetworkAclId: !Ref 'DatabaseNetworkAcl'
 
-# Security Groups
-  # InstanceSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: All EC2 instances should be in this security group
-  #     VpcId: !Ref 'Vpc'
-  #     SecurityGroupIngress:
-  #       - IpProtocol: icmp
-  #         FromPort: '8'
-  #         ToPort: '-1'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: icmp
-  #         FromPort: '3'
-  #         ToPort: '4'
-  #         CidrIp: 0.0.0.0/0
-  #     SecurityGroupEgress:
-  #       - IpProtocol: icmp
-  #         FromPort: '8'
-  #         ToPort: '-1'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: icmp
-  #         FromPort: '3'
-  #         ToPort: '4'
-  #         CidrIp: 0.0.0.0/0
-  #     Tags:
-  #       - Key: Service
-  #         Value: infra
-  #       - Key: Name
-  #         Value: instance-sg
-  #
-  # DnsIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: udp
-  #     FromPort: '53'
-  #     ToPort: '53'
-  #     SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # SshIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: tcp
-  #     FromPort: '22'
-  #     ToPort: '22'
-  #     SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # RdpIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: tcp
-  #     FromPort: '3389'
-  #     ToPort: '3389'
-  #     SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # HttpIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: tcp
-  #     FromPort: '80'
-  #     ToPort: '80'
-  #     SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # HttpsIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: tcp
-  #     FromPort: '443'
-  #     ToPort: '443'
-  #     SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # DnsEgress:
-  #   Type: AWS::EC2::SecurityGroupEgress
-  #   Properties:
-  #     GroupId: !Ref 'InstanceSecurityGroup'
-  #     IpProtocol: udp
-  #     FromPort: '53'
-  #     ToPort: '53'
-  #     DestinationSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #
-  # PublicLoadBalancerSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Public Load Balancer Enable HTTP/HTTPS access
-  #     VpcId: !Ref 'Vpc'
-  #     SecurityGroupIngress:
-  #       - IpProtocol: tcp
-  #         FromPort: '25'
-  #         ToPort: '25'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: '80'
-  #         ToPort: '80'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: '443'
-  #         ToPort: '443'
-  #         CidrIp: 0.0.0.0/0
-  #     Tags:
-  #       - Key: Service
-  #         Value: infra
-  #       - Key: Name
-  #         Value: public-load-balancer-sg
-  #
-  # PrivateLoadBalancerSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Internal Load Balancer Enable HTTP/HTTPS access
-  #     VpcId: !Ref 'Vpc'
-  #     SecurityGroupIngress:
-  #       - IpProtocol: '-1'
-  #         SourceSecurityGroupId: !Ref 'InstanceSecurityGroup'
-  #     SecurityGroupEgress:
-  #       - IpProtocol: '-1'
-  #         CidrIp: 0.0.0.0/0
-  #     Tags:
-  #       - Key: Service
-  #         Value: infra
-  #       - Key: Name
-  #         Value: private-load-balancer-sg
-  #
-  # OutboundToInternetSecurityGroup:
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Enable HTTP/s, SMTP access outbound to Internet
-  #     VpcId: !Ref 'Vpc'
-  #     SecurityGroupEgress:
-  #       - IpProtocol: tcp
-  #         FromPort: '80'
-  #         ToPort: '80'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: '443'
-  #         ToPort: '443'
-  #         CidrIp: 0.0.0.0/0
-  #       - IpProtocol: tcp
-  #         FromPort: '25'
-  #         ToPort: '25'
-  #         CidrIp: 0.0.0.0/0
-  #     Tags:
-  #       - Key: Service
-  #         Value: infra
-  #       - Key: Name
-  #         Value: outbound-to-internet-sg
-
+### SNS ###
   SnsTopic:
     Type: AWS::SNS::Topic
     Properties:

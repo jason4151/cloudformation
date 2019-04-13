@@ -2,11 +2,15 @@
 # Execute the following command from the cfn directory:
 # aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://capstone-cfn/mysql-rds.yml
 
+# The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
 
+# The Description section contains a text string that describes the purpose of the template.
 Description: >
   This template creates a RDS MySQL Database for the CIS-5898 Capstone project.
 
+# The Parameters section contains all of the values that are passed to the template at runtime.
+# Values can be set to a default or fed into the template via a parameters file or the CLI.
 Parameters:
   DeploymentId:
     Type: String
@@ -33,6 +37,7 @@ Parameters:
     Type: String
     Default: db.t2.micro
 
+# The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
 #### RDS MySQL Database ###
   RdsMySqlSubnetGroup:
@@ -126,6 +131,9 @@ Resources:
       TargetId: !Ref RdsMySqlDbInstance
       TargetType: AWS::RDS::DBInstance
 
+# The Outputs section contains all of the values that will be returned when the stack is deployed.
+# This section also contains exports which can be used as inputs within other CloudFormation
+# templates.
 Outputs:
   RdsMySqlDbInstanceUrl:
     Description: RDS MySQL Database URL
