@@ -308,7 +308,7 @@ Resources:
               - cloudwatch:PutMetricData
             Resource: '*'
 
-# Allow CodeDeploy service to perforam actions on Web Server 
+# Allow CodeDeploy service to perform actions on Web Server 
   WebServerCodeDeployPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -329,6 +329,7 @@ Resources:
             Resource:
               - '*'
 
+# Allow CodePipeline service to peform actions on Web Server
   WebServerCodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
@@ -342,7 +343,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       Policies:
-      - PolicyName: WedServerCodePipelinePolicy
+      - PolicyName: WebServerCodePipelinePolicy
         PolicyDocument:
           Statement:
           - Action:

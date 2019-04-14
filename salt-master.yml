@@ -47,6 +47,21 @@ Parameters:
     Description: Amazon Machine Image ID
     Default: ami-0b8d0d6ac70e5750c
 
+  GitHubAccount:
+    Type: String
+    Description: GitHub Account
+    Default: jason4151
+
+  GitHubRepository:
+    Type: String
+    Description: GitHub Repository
+    Default: capstone-salt
+
+  GitHubBranch:
+    Type: String
+    Description: GitHub Branch
+    Default: master
+
 # The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
 ### EC2 ###
@@ -121,6 +136,48 @@ Resources:
           Type: KEY_AND_VALUE
       ServiceRoleArn: 
         Fn::GetAtt: [ SaltMasterRole, Arn ]  
+
+### CodePipeline ###
+  SaltMasterCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${Service}-code-${DeploymentId}
+      RoleArn: !GetAtt [SaltMasterCodePipelineRole, Arn]
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Version: '1'
+            Provider: GitHub
+          OutputArtifacts:
+          - Name: SourceArtifact
+          Configuration:
+            Owner: !Ref 'GitHubAccount'
+            Repo: !Ref 'GitHubRepository'
+            Branch: !Ref 'GitHubBranch'
+            OAuthToken: !Join ['', ['{{resolve:secretsmanager:', GitHubApiKey, ':SecretString:GitHubApiKey}}' ]]  
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Artifact
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CodeDeploy
+          InputArtifacts:
+          - Name: SourceArtifact
+          Configuration:
+            ApplicationName: !Ref 'SaltMasterCodeDeployApplication'
+            DeploymentGroupName: !Ref 'SaltMasterCodeDeployDeploymentGroup'
+          RunOrder: 2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref 'SaltMasterS3Bucket'
 
 ### Route 53 ###
   SaltMasterInternalDnsRecord:
@@ -269,6 +326,46 @@ Resources:
       Path: /
       Roles:
         - !Ref 'SaltMasterRole'
+
+# Allow CodePipeline service to peform actions on Salt Master
+  SaltMasterCodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: SaltMasterCodePipelinePolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - codedeploy:*
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:GetBucketVersioning
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:PutObject
+            Resource:
+            - arn:aws:s3:::codepipeline*
+            Effect: Allow
+          - Action:
+            - s3:*
+            - cloudformation:*
+            - iam:PassRole
+            Resource: "*"
+            Effect: Allow
+          Version: '2012-10-17'
 
 # The Outputs section contains all of the values that will be returned when the stack is deployed.
 # This section also contains exports which can be used as inputs within other CloudFormation
