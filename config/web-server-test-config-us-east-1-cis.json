@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "capstone"
+  },
+  {
+    "ParameterKey": "DeploymentId",
+    "ParameterValue": "cis"
+  },
+  {
+    "ParameterKey": "Service",
+    "ParameterValue": "web-server-test"
+  },
+  {
+    "ParameterKey": "HostedZoneName",
+    "ParameterValue": "moskowitz.sh."
+  },
+  {
+    "ParameterKey": "Owner",
+    "ParameterValue": "jmoskowitz2017@my.fit.edu"
+  },
+  {
+    "ParameterKey": "AmiId",
+    "ParameterValue": "ami-0b8d0d6ac70e5750c"
+  },
+  {
+    "ParameterKey": "GitHubBranch",
+    "ParameterValue": "test"
+  }
+]

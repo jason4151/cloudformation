@@ -1,5 +1,5 @@
 # AWS CLI deployment command
-# Execute the following command from the cfn directory:
+# Execute the following command from the project directory:
 # aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://capstone-cfn/mysql-rds.yml
 
 # The data format version that the template conforms to.
