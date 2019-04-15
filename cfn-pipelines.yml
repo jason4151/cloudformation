@@ -1,0 +1,115 @@
+# AWS CLI deployment command
+# Execute the following command from the cfn directory:
+# aws --profile capstone cloudformation create-stack --stack-name cfn-pipelines-us-east-1-cis --template-body file://capstone-cfn/cfn-pipelines.yml
+
+# The data format version that the template conforms to.
+AWSTemplateFormatVersion: '2010-09-09'
+
+# The Description section contains a text string that describes the purpose of the template.
+Description: >
+  This template creates CodePipeline CloudFromation deployments for the CIS-5898 Capstone project.
+
+# The Parameters section contains all of the values that are passed to the template at runtime.
+# Values can be set to a default or fed into the template via a parameters file or the CLI.
+Parameters:
+  DeploymentId:
+    Type: String
+    Description: A unique deployment identifier.
+    Default: cis
+
+  Service:
+    Type: String
+    Description: Name of the service or product that is associated with this stack.
+    Default: cfn-pipelines
+
+  Owner:
+    Type: String
+    Description: Email address of the person that created the stack.
+    Default: jmoskowitz2017@my.fit.edu
+
+  TemplateFileName:
+    Type: String
+    Description: CloudFormation Template File Name
+    Default: vpc.yml
+
+  TemplateConfigFileName:
+    Type: String
+    Description: CloudFormation Template Config File Name
+    Default: config/vpc-19-config-us-east-1-cis.json
+
+  GitHubAccount:
+    Type: String
+    Description: GitHub Account
+    Default: jason4151
+
+  GitHubRepository:
+    Type: String
+    Description: GitHub Repository
+    Default: capstone-cfn
+
+  GitHubBranch:
+    Type: String
+    Description: GitHub Branch
+    Default: master
+
+# The Resources section specifies the resources and their properties deployed in the stack.
+Resources:
+### S3 ###
+  CfnS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
+      # VersioningConfiguration:
+      #   Status: Disabled
+
+### CodePipeline ###
+  WebServerCfnCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${Service}-${SupernetNumber}-cfn-${DeploymentId}
+      RoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/ServiceRoleForCFN"
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Version: '1'
+            Provider: GitHub
+          OutputArtifacts:
+          - Name: SourceArtifact
+          Configuration:
+            Owner: !Ref 'GitHubAccount'
+            Repo: !Ref 'GitHubRepository'
+            Branch: !Ref 'GitHubBranch'
+            OAuthToken: !Join ['', ['{{resolve:secretsmanager:', GitHubApiKey, ':SecretString:GitHubApiKey}}' ]]  
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Artifact
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: CloudFormation
+          InputArtifacts:
+          - Name: SourceArtifact
+          Configuration:
+            ActionMode: CREATE_UPDATE
+       #     Capabilities: CAPABILITY_NAMED_IAM
+            RoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/ServiceRoleForCFN"
+            StackName: !Ref 'AWS::StackName'
+            TemplatePath: !Sub "SourceArtifact::${TemplateFileName}"
+            TemplateConfiguration: !Sub "SourceArtifact::${TemplateConfigFileName}"
+          RunOrder: 2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref 'CfnS3Bucket'
+
+# The Outputs section contains all of the values that will be returned when the stack is deployed.
+# This section also contains exports which can be used as inputs within other CloudFormation
+# templates.
+#Outputs:
