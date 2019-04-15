@@ -2,10 +2,10 @@
 # Execute the following commands from the project directory:
 #
 # Production Stack:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/config/web-server-prod-config-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-prod-params-us-east-1-cis.json
 #
 # Test Stack:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/config/web-server-test-config-us-east-1-cis.json
+# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-test-params-us-east-1-cis.json
 
 # The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
