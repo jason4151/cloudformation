@@ -125,27 +125,16 @@ Resources:
         - Key: Name
           Value: linux-bastion-ec2-sg
 
-# Allow SSH port 22 access to Linux Bastion EC2 instance from Home address
-  LinuxBastionEc2SecurityGroupSshHomeInbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Home Access Port 22
-      GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '22'
-      ToPort: '22'
-      CidrIp: 50.89.175.153/32
-
-# Allow SSH port 22 access to Linux Bastion EC2 instance from FIT address
-  LinuxBastionEc2SecurityGroupSshFitInbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: FIT Access Port 22
-      GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '22'
-      ToPort: '22'
-      CidrIp: 18.215.124.220/32
+# Allow SSH port 22 access to Linux Bastion EC2 instance from Specific IP address
+  # LinuxBastionEc2SecurityGroupSshHomeInbound:
+  #   Type: AWS::EC2::SecurityGroupIngress
+  #   Properties:
+  #     Description: Specific Access Port 22
+  #     GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
+  #     IpProtocol: tcp
+  #     FromPort: '22'
+  #     ToPort: '22'
+  #     CidrIp: 5.5.5.5/32
 
 ### IAM Role & Policies ###
   LinuxBastionRole:

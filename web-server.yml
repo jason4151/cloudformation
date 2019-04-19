@@ -248,27 +248,16 @@ Resources:
       ToPort: '80'
       CidrIp: 10.19.0.0/24
 
-# Allow Web port 80 access to WebServer EC2 instance from Home address
-  WebServerEc2SecurityGroup80HomeInbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Home Access Port 80
-      GroupId: !Ref 'WebServerEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '80'
-      ToPort: '80'
-      CidrIp: 50.89.175.153/32
-
-# Allow Web port 80 access to WebServer EC2 instance from FIT address
-  WebServerEc2SecurityGroup80FitInbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: FIT Access Port 80
-      GroupId: !Ref 'WebServerEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '80'
-      ToPort: '80'
-      CidrIp: 18.215.123.220/32
+# Allow Web port 80 access to WebServer EC2 instance from Specific IP address
+#   WebServerEc2SecurityGroup80FitInbound:
+#     Type: AWS::EC2::SecurityGroupIngress
+#     Properties:
+#       Description: Specfic Access Port 80
+#       GroupId: !Ref 'WebServerEc2SecurityGroup'
+#       IpProtocol: tcp
+#       FromPort: '80'
+#       ToPort: '80'
+#       CidrIp: 5.5.5.5/32
 
 # Allow SSH port 22 access to WebServer EC2 instance from VPC addresses
   WebServerEc2SecurityGroupSshInbound:
