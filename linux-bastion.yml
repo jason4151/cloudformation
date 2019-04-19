@@ -1,6 +1,7 @@
 # AWS CLI deployment command
 # Execute the following command from the project directory:
 # aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://capstone-cfn/linux-bastion.yml
+# aws --profile capstone cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://capstone-cfn/linux-bastion.yml
 
 # The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
@@ -78,7 +79,7 @@ Resources:
             # Install AWS Tools
             wget https://aws-codedeploy-${AWS::Region}.s3.amazonaws.com/latest/install
             chmod +x ./install
-            yum -y install ruby
+            yum -y install ruby mysql
             ./install auto
             yum install -y aws-cfn-bootstrap
             # Install Salt Minion and set system role
@@ -124,15 +125,27 @@ Resources:
         - Key: Name
           Value: linux-bastion-ec2-sg
 
-# Allow SSH port 22 access to Linux Bastion EC2 instance from specific addresses
-  LinuxBastionEc2SecurityGroupSshInbound:
+# Allow SSH port 22 access to Linux Bastion EC2 instance from Home address
+  LinuxBastionEc2SecurityGroupSshHomeInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: Home Access Port 22
       GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '22'
       ToPort: '22'
       CidrIp: 50.89.175.153/32
+
+# Allow SSH port 22 access to Linux Bastion EC2 instance from FIT address
+  LinuxBastionEc2SecurityGroupSshFitInbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: FIT Access Port 22
+      GroupId: !Ref 'LinuxBastionEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: 18.215.124.220/32
 
 ### IAM Role & Policies ###
   LinuxBastionRole:
