@@ -208,6 +208,7 @@ Resources:
   SaltMasterEc2SecurityGroupSshInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: VPC Access Port 22
       GroupId: !Ref 'SaltMasterEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '22'
@@ -218,6 +219,7 @@ Resources:
   SaltMasterEc2SecurityGroup4505Inbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: VPC Access Port 4505
       GroupId: !Ref 'SaltMasterEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '4505'
@@ -228,6 +230,7 @@ Resources:
   SaltMasterEc2SecurityGroup4505Inbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: VPC Access Port 4506
       GroupId: !Ref 'SaltMasterEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '4506'

@@ -16,6 +16,10 @@
     "ParameterValue": "moskowitz.sh."
   },
   {
+    "ParameterKey": "HostedZoneInternalName",
+    "ParameterValue": "moskowitz.int."
+  },
+  {
     "ParameterKey": "Owner",
     "ParameterValue": "jmoskowitz2017@my.fit.edu"
   },

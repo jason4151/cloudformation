@@ -3,9 +3,12 @@
 #
 # Production Stack:
 # aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-prod-params-us-east-1-cis.json
+# aws --profile capstone cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-prod-params-us-east-1-cis.json
 #
 # Test Stack:
 # aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-test-params-us-east-1-cis.json
+# aws --profile capstone cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-test-params-us-east-1-cis.json
+
 
 # The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
@@ -37,6 +40,11 @@ Parameters:
     Description: Route53 DNS Hosted Zone Name.
     Default: moskowitz.sh.
     
+  HostedZoneInternalName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Name.
+    Default: moskowitz.int.    
+
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
@@ -205,17 +213,17 @@ Resources:
       ResourceRecords:
       - !Ref 'WebServerEc2Eip'
 
-  # WebServerInternalDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   DependsOn: WebServerEc2Instance
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneInternalName'
-  #     Comment: DNS name for WebServer instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'AWS::Region', ., !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt WebServerEc2Instance.PrivateDnsName
+  WebServerInternalDnsRecord:
+    Type: AWS::Route53::RecordSet
+    DependsOn: WebServerEc2Instance
+    Properties:
+      HostedZoneName: !Ref 'HostedZoneInternalName'
+      Comment: DNS name for WebServer instance.
+      Name: !Join ['', [!Ref 'Service', -, !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+      - !GetAtt WebServerEc2Instance.PrivateDnsName
 
 ### Security Groups ###
   WebServerEc2SecurityGroup:
@@ -233,16 +241,40 @@ Resources:
   WebServerEc2SecurityGroup80inbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: VPC Access Port 80
       GroupId: !Ref 'WebServerEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '80'
       ToPort: '80'
       CidrIp: 10.19.0.0/24
 
+# Allow Web port 80 access to WebServer EC2 instance from Home address
+  WebServerEc2SecurityGroup80HomeInbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Home Access Port 80
+      GroupId: !Ref 'WebServerEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 50.89.175.153/32
+
+# Allow Web port 80 access to WebServer EC2 instance from FIT address
+  WebServerEc2SecurityGroup80FitInbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: FIT Access Port 80
+      GroupId: !Ref 'WebServerEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 18.215.123.220/32
+
 # Allow SSH port 22 access to WebServer EC2 instance from VPC addresses
   WebServerEc2SecurityGroupSshInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
+      Description: VPC Access Port 22
       GroupId: !Ref 'WebServerEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '22'
