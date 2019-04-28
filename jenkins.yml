@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-us-east-1-demo --template-body file://cfn/jenkins.yml --parameters file://cfn/params/jenkins-params-us-east-1-demo.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-us-east-1-demo --template-body file://jenkins.yml --parameters file://params/jenkins-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -101,28 +101,28 @@ Resources:
         Status: Enabled
 
 ### Route 53 ###
-  # JenkinsDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneName'
-  #     Comment: DNS name for Jenkins instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt JenkinsPublicAlb.DNSName
+   JenkinsDnsRecord:
+     Type: AWS::Route53::RecordSet
+     Properties:
+       HostedZoneName: !Ref 'HostedZoneName'
+       Comment: DNS name for Jenkins instance.
+       Name: !Join ['', [!Ref 'Service', ., !Ref 'HostedZoneName']]
+       Type: CNAME
+       TTL: '300'
+       ResourceRecords:
+       - !GetAtt JenkinsPublicAlb.DNSName
 
-  # JenkinsInternalDnsRecord:
-  #   Type: AWS::Route53::RecordSet
-  #   DependsOn: JenkinsEc2Instance
-  #   Properties:
-  #     HostedZoneName: !Ref 'HostedZoneInternalName'
-  #     Comment: DNS name for Jenkins instance.
-  #     Name: !Join ['', [!Ref 'Service', ., !Ref 'AWS::Region', ., !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
-  #     Type: CNAME
-  #     TTL: '300'
-  #     ResourceRecords:
-  #     - !GetAtt JenkinsEc2Instance.PrivateDnsName
+   JenkinsInternalDnsRecord:
+     Type: AWS::Route53::RecordSet
+     DependsOn: JenkinsEc2Instance
+     Properties:
+       HostedZoneName: !Ref 'HostedZoneInternalName'
+       Comment: DNS name for Jenkins instance.
+       Name: !Join ['', [!Ref 'Service', ., !Ref 'AWS::Region', ., !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
+       Type: CNAME
+       TTL: '300'
+       ResourceRecords:
+       - !GetAtt JenkinsEc2Instance.PrivateDnsName
 
 ### Security Groups ###
   JenkinsEc2SecurityGroup:
