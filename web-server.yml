@@ -1,8 +1,8 @@
 # Production Stack:
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://cfn/web-server.yml --parameters file://cfn/params/web-server-prod-params-us-east-1-cis.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-prod-params-us-east-1-cis.json
 #
 # Test Stack:
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://cfn/web-server.yml --parameters file://cfn/params/web-server-test-params-us-east-1-cis.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-test-params-us-east-1-cis.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
