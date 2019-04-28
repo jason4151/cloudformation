@@ -33,6 +33,14 @@ Parameters:
     Type: String
     Description: Amazon Machine Image ID
 
+  HostedZoneName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Name.
+    
+  HostedZoneInternalName:
+    Type: String
+    Description: Route53 DNS Hosted Zone Name.
+
 Resources:
 ### EC2 ###
   JenkinsEc2Instance:
