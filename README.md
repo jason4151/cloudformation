@@ -1,2 +1,2 @@
 # cfn
-This repository contains AWS CloudFormation code that is used as a starting point for an assortment of services.
+AWS CloudFormation templates used as a starting point for deploying an assortment of services.
