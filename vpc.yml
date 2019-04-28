@@ -1,16 +1,10 @@
-# AWS CLI deployment command
-# Execute the following command from the project directory:
-# aws --profile capstone cloudformation create-stack --stack-name vpc-19-us-east-1-cis --template-body file://capstone-cfn/vpc.yml
+# aws --profile demo cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://cfn/vpc.yml
 
-# The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
 
-# The Description section contains a text string that describes the purpose of the template.
 Description: >
-  This template creates a AWS VPC for the CIS-5898 Capstone project.
+  This template creates an AWS VPC (/24).
 
-# The Parameters section contains all of the values that are passed to the template at runtime.
-# Values can be set to a default or fed into the template via a parameters file or the CLI.
 Parameters:
   VpcName:
     Description: The VPC Name name.
@@ -44,7 +38,6 @@ Parameters:
     Type: String
     Default: jmoskowitz2017@my.fit.edu
 
-# The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
 ### VPC ###
   Vpc:
@@ -354,7 +347,6 @@ Resources:
     Properties:
       SubnetId: !Ref 'MgmtSubnetAz2'
       RouteTableId: !Ref 'MgmtRouteTableAz2'
-
 
 # Product Network Routes and Route Tables
   ProductRouteTableAz1:

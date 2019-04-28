@@ -5,7 +5,7 @@
   },
   {
     "ParameterKey": "DeploymentId",
-    "ParameterValue": "cis"
+    "ParameterValue": "demo"
   },
   {
     "ParameterKey": "Service",
@@ -21,7 +21,7 @@
   },
   {
     "ParameterKey": "Owner",
-    "ParameterValue": "jmoskowitz2017@my.fit.edu"
+    "ParameterValue": "jason@moskowitz.sh"
   },
   {
     "ParameterKey": "AmiId",

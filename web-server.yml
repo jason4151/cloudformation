@@ -1,34 +1,24 @@
-# AWS CLI deployment command
-# Execute the following commands from the project directory:
-#
 # Production Stack:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-prod-params-us-east-1-cis.json
-# aws --profile capstone cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-prod-params-us-east-1-cis.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-cis --template-body file://cfn/web-server.yml --parameters file://cfn/params/web-server-prod-params-us-east-1-cis.json
 #
 # Test Stack:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-test-params-us-east-1-cis.json
-# aws --profile capstone cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://capstone-cfn/web-server.yml --parameters file://capstone-cfn/params/web-server-test-params-us-east-1-cis.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-cis --template-body file://cfn/web-server.yml --parameters file://cfn/params/web-server-test-params-us-east-1-cis.json
 
-
-# The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
 
-# The Description section contains a text string that describes the purpose of the template.
 Description: >
   This template creates a Web Server EC2 instance for the CIS-5898 Capstone project.
 
-# The Parameters section contains all of the values that are passed to the template at runtime.
-# Values can be set to a default or fed into the template via a parameters file or the CLI.
 Parameters:
   DeploymentId:
     Type: String
     Description: A unique deployment identifier.
-    Default: cis
+    Default: demo
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: EC2 KeyPair to enable SSH access to the ECS instances.
-    Default: capstone
+    Default: demo
 
   InstanceType:
     Description: EC2 instance type
@@ -38,12 +28,10 @@ Parameters:
   HostedZoneName:
     Type: String
     Description: Route53 DNS Hosted Zone Name.
-    Default: moskowitz.sh.
     
   HostedZoneInternalName:
     Type: String
     Description: Route53 DNS Hosted Zone Name.
-    Default: moskowitz.int.    
 
   Service:
     Type: String
@@ -53,7 +41,6 @@ Parameters:
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
-    Default: jmoskowitz2017@my.fit.edu
 
   AmiId:
     Type: String
@@ -68,7 +55,7 @@ Parameters:
   GitHubRepository:
     Type: String
     Description: GitHub Repository
-    Default: capstone-app
+    Default: demo-app
 
   GitHubBranch:
     Type: String
@@ -133,7 +120,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
+      BucketName: !Join ['', [ demo, -, !Ref 'Service', -, !Ref 'AWS::Region']]
       VersioningConfiguration:
         Status: Enabled
 
@@ -249,15 +236,15 @@ Resources:
       CidrIp: 10.19.0.0/24
 
 # Allow Web port 80 access to WebServer EC2 instance from Specific IP address
-#   WebServerEc2SecurityGroup80FitInbound:
-#     Type: AWS::EC2::SecurityGroupIngress
-#     Properties:
-#       Description: Specfic Access Port 80
-#       GroupId: !Ref 'WebServerEc2SecurityGroup'
-#       IpProtocol: tcp
-#       FromPort: '80'
-#       ToPort: '80'
-#       CidrIp: 5.5.5.5/32
+  WebServerEc2SecurityGroup80FitInbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Specfic Access Port 80
+      GroupId: !Ref 'WebServerEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: 5.5.5.5/32
 
 # Allow SSH port 22 access to WebServer EC2 instance from VPC addresses
   WebServerEc2SecurityGroupSshInbound:
@@ -403,9 +390,6 @@ Resources:
       Roles:
         - !Ref 'WebServerRole'
 
-# The Outputs section contains all of the values that will be returned when the stack is deployed.
-# This section also contains exports which can be used as inputs within other CloudFormation
-# templates.
 Outputs:
   WebServerEc2InstancePrivateDnsName:
      Value: !GetAtt WebServerEc2Instance.PrivateDnsName

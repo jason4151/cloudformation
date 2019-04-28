@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "capstone"
+  },
+  {
+    "ParameterKey": "DeploymentId",
+    "ParameterValue": "cis"
+  },
+  {
+    "ParameterKey": "Service",
+    "ParameterValue": "windows-bastion"
+  },
+  {
+    "ParameterKey": "Owner",
+    "ParameterValue": "jmoskowitz2017@my.fit.edu"
+  },
+  {
+    "ParameterKey": "AmiId",
+    "ParameterValue": "ami-0bf148826ef491d16"
+  }
+]

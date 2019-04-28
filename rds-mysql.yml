@@ -1,26 +1,19 @@
-# AWS CLI deployment command
-# Execute the following command from the project directory:
-# aws --profile capstone cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name mysql-rds-east-1-cis --template-body file://capstone-cfn/mysql-rds.yml
+# aws --profile default cloudformation create-stack --stack-name mysql-rds-east-1-demo --template-body file://cfn/rds-mysql.yml
 
-# The data format version that the template conforms to.
 AWSTemplateFormatVersion: '2010-09-09'
 
-# The Description section contains a text string that describes the purpose of the template.
 Description: >
-  This template creates a RDS MySQL Database for the CIS-5898 Capstone project.
+  This template creates a RDS MySQL Database.
 
-# The Parameters section contains all of the values that are passed to the template at runtime.
-# Values can be set to a default or fed into the template via a parameters file or the CLI.
 Parameters:
   DeploymentId:
     Type: String
     Description: A unique deployment identifier.
-    Default: cis
+    Default: demo
 
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
-    Default: jmoskowitz2017@my.fit.edu
 
   Service:
     Type: String
@@ -30,7 +23,7 @@ Parameters:
   RdsMySqlDatabaseName:
     Type: String
     Description: RDS database name.
-    Default: capstone
+    Default: demo
 
   RdsMySqlInstanceType:
     Description: RDS EC2 instance type

@@ -1,2 +1,2 @@
-# capstone-cfn
-This repository contains AWS CloudFormation code that is used for the CIS-5898 Capstone project.
+# cfn
+This repository contains AWS CloudFormation code that is used for an assortment of services.
