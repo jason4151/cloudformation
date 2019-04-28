@@ -1,4 +1,4 @@
-# aws --profile default cloudformation create-stack --stack-name mysql-rds-east-1-demo --template-body file://cfn/rds-mysql.yml
+# aws --profile default cloudformation create-stack --stack-name mysql-rds-east-1-demo --template-body file://rds-mysql.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -32,7 +32,7 @@ Parameters:
 
 # The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
-#### RDS MySQL Database ###
+### RDS MySQL Database ###
   RdsMySqlSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -124,9 +124,6 @@ Resources:
       TargetId: !Ref RdsMySqlDbInstance
       TargetType: AWS::RDS::DBInstance
 
-# The Outputs section contains all of the values that will be returned when the stack is deployed.
-# This section also contains exports which can be used as inputs within other CloudFormation
-# templates.
 Outputs:
   RdsMySqlDbInstanceUrl:
     Description: RDS MySQL Database URL
