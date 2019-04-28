@@ -1,9 +1,9 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-us-east-1-demo --template-body file://jenkins.yml --parameters file://params/jenkins-params-us-east-1-demo.json
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-service-us-east-1-demo --template-body file://jenkins-service.yml --parameters file://params/jenkins-service-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a Jenkins EC2 instance for the CIS-5898 Capstone project.
+  This template creates a Jenkins EC2 instance.
 
 Parameters:
   DeploymentId:
