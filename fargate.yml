@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --stack-name fargate-demo-us-east-1-demo --template-body file://cfn/fargate.yml --parameters file://cfn/params/fargate-us-east-1-demo.json
+# aws --profile demo cloudformation create-stack --stack-name fargate-demo-us-east-1-demo --template-body file://fargate.yml --parameters file://params/fargate-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
