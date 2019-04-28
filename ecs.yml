@@ -3,7 +3,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a Amazon ECS cluster with auto scaling for a demo application.
+  This template creates an Amazon ECS cluster with auto scaling for a demo application.
 
 Parameters:
   DeploymentId:
@@ -357,7 +357,7 @@ Resources:
                 - "/etc/cfn/cfn-hup.conf"
                 - "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
 
-# Event Mapping Service
+# Demo App Service
   DemoAppService:
     Type: AWS::ECS::Service
     Properties:
@@ -450,7 +450,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: connector-messaging-event-mapper-responses-prod
+      BucketName: !Sub ${Service}-demo-${DeploymentId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
         - ServerSideEncryptionByDefault:
