@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://cfn/vpc.yml
+# aws --profile demo cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -13,10 +13,10 @@ Parameters:
     MaxLength: '30'
     AllowedPattern: '[a-zA-Z0-9-]+'
     ConstraintDescription: 1 to 30 lower case alphanumeric characters.
-    Default: vpc-19-us-east-1-cis
+    Default: vpc-19-us-east-1-demo
 
   SupernetNumber:
-    Description: The value for the second octet 10.x.0.0/16 (65534 IPs).
+    Description: The value for the second octet 10.x.0.0/24.
     Type: Number
     MinValue: '10'
     MaxValue: '250'
@@ -36,7 +36,7 @@ Parameters:
   SnsEmail:
     Description: An email address to send SNS notifications to.
     Type: String
-    Default: jmoskowitz2017@my.fit.edu
+    Default: jason@moskowitz.sh
 
 Resources:
 ### VPC ###
@@ -753,9 +753,6 @@ Resources:
           Protocol: email
       TopicName: !Ref 'VpcName'
 
-# The Outputs section contains all of the values that will be returned when the stack is deployed.
-# This section also contains exports which can be used as inputs within other CloudFormation
-# templates.
 Outputs:
   VpcId:
     Value: !Ref 'Vpc'
