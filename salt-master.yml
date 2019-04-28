@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://cfn/salt-master.yml
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://salt-master.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
