@@ -172,6 +172,9 @@ Resources:
   DemoDynamoDbAppSettings:
     Type: AWS::DynamoDB::Table
     Properties:
+      # Encryption at rest does not support customer managed CMKs at this time.
+      # https://docs.aws.amazon.com/kms/latest/developerguide/services-dynamodb.html
+      SSEEnabled: true
       AttributeDefinitions:
         - AttributeName: environment
           AttributeType: S
@@ -186,31 +189,6 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
       TableName: app-settings
-      Tags:
-        - Key: Name
-          Value: !Sub ${Service}-dynamodb-${DeploymentId}
-        - Key: Service
-          Value: !Ref 'Service'
-        - Key: Owner
-          Value: !Ref 'Owner'
-
-  DemoDynamoDbFactors:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: environment
-          AttributeType: S
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: environment
-          KeyType: HASH
-        - AttributeName: id
-          KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: 3
-        WriteCapacityUnits: 3
-      TableName: Factors
       Tags:
         - Key: Name
           Value: !Sub ${Service}-dynamodb-${DeploymentId}
@@ -269,7 +247,6 @@ Resources:
                 aws:SourceArn: !Join [ "", ["arn:aws:s3:*:*:", !Ref 'DemoS3Bucket' ] ]
       Queues:
       - !Ref 'DemoSqsQueue'
-
 
 ### EMR ###
   DemoEmrCluster:
