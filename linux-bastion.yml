@@ -1,6 +1,4 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://cfn/linux-bastion.yml
-# aws --profile demo cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://cfn/linux-bastion.yml
-
+# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://linux-bastion.yml
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
