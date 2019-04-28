@@ -32,7 +32,7 @@ Resources:
   DemoEcsCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub ${Service}-etl-${DeploymentId}
+      ClusterName: !Sub ${Service}-demo-${DeploymentId}
 
 # Demo Service
   DemoService:
