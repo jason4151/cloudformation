@@ -4,13 +4,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template demonstrates the configuration for a number of AWS services:
+  This template demonstrates the configuration for a number of AWS services using KMS:
     * DynamoDB
     * Elasticsearch
     * EMR
     * Kinesis
     * KMS
     * S3
+    * SQS
   
 Parameters:
   DeploymentId:
@@ -218,6 +219,58 @@ Resources:
         - Key: Owner
           Value: !Ref 'Owner'
 
+### S3 ###
+  DemoS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub ${Service}-demo-${DeploymentId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            KMSMasterKeyID: !ImportValue 'DemoKmsCustomerMasterKey'
+            SSEAlgorithm: aws:kms         
+     # The creation of an S3 bucket with a event notification must be done
+     # seperately from the creation of the service, e.g. SQS, Lamba due a
+     # circular dependency issue.
+     # NotificationConfiguration: 
+     #  QueueConfigurations:
+     #    - Event: 's3:ObjectCreated:*'
+     #      Queue: !GetAtt [DemoSqsQueue, Arn]
+      VersioningConfiguration:
+        Status: Enabled
+
+### SQS ###
+  DemoSqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${Service}-demo-${DeploymentId}
+      MaximumMessageSize: 262144
+      MessageRetentionPeriod: 345600
+      VisibilityTimeout: 30
+      KmsMasterKeyId: !ImportValue 'DemoKmsCustomerMasterKey'
+
+  DemoSqsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Id: DemoSqsQueuePolicy
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3Bucket
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action:
+              - sqs:*
+            Resource: !GetAtt [DemoSqsQueue, Arn]
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Join [ "", ["arn:aws:s3:*:*:", !Ref 'DemoS3Bucket' ] ]
+      Queues:
+      - !Ref 'DemoSqsQueue'
+
+
 ### EMR ###
   DemoEmrCluster:
     Type: AWS::EMR::Cluster
@@ -388,9 +441,9 @@ Outputs:
       Name: DemoElasticsearchClusterUrl
 
   DemoKinesisStream:
-    Value: !Ref 'DemoActivitiesKinesisStream'
+    Value: !Ref 'DemoKinesisStream'
     Export:
-      Name: DemoActivitiesKinesisStream
+      Name: DemoActivitiesStream
   
   DemoKmsCustomerMasterKey:
     Value: !GetAtt [DemoKmsCustomerMasterKey, Arn]
