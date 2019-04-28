@@ -1,10 +1,10 @@
 # aws --profile demo iam create-service-linked-role --aws-service-name es.amazonaws.com
-# aws --profile demo cloudformation create-stack --stack-name core-us-east-1-demo --template-body file://core.yml --parameters file://params/core-params-us-east-1-demo.json
+# aws --profile demo cloudformation create-stack --stack-name kms-services-us-east-1-demo --template-body file://kms-services.yml --parameters file://params/kms-services-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template demonstrates the configuration for a number of AWS services using KMS:
+  This template demonstrates the configuration for a number of AWS services with encryption at rest using KMS:
     * DynamoDB
     * Elasticsearch
     * EMR
