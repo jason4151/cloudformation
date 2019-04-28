@@ -1,11 +1,17 @@
 # aws --profile demo iam create-service-linked-role --aws-service-name es.amazonaws.com
-# aws --profile demo cloudformation create-stack --stack-name core-us-east-1-demo --template-body file://cfn/core.yml --parameters file://cfn/params/core-params-us-east-1-demo.json
+# aws --profile demo cloudformation create-stack --stack-name core-us-east-1-demo --template-body file://core.yml --parameters file://params/core-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template demonstrates the configuration for a number of AWS services.
-
+  This template demonstrates the configuration for a number of AWS services:
+    * DynamoDB
+    * Elasticsearch
+    * EMR
+    * Kinesis
+    * KMS
+    * S3
+  
 Parameters:
   DeploymentId:
     Type: String
