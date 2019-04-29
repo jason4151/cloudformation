@@ -19,11 +19,6 @@ Parameters:
     Description: Name of the service or product that is associated with this stack.
     Default: example
 
-  Schedule:
-    Type: String
-    Description: Referenced by the schdeduler Lambda function.
-    Default: none
-
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: EC2 KeyPair to enable SSH access to the ECS instances.
@@ -91,7 +86,7 @@ Resources:
   DemoEcsCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub ${Service}-demo-${DeploymentId}
+      ClusterName: !Sub ${Service}-ecs-${DeploymentId}
 
   DemoEcsAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -125,7 +120,7 @@ Resources:
           - autoscaling:EC2_INSTANCE_TERMINATE_ERROR
       Tags:
         - Key: Name
-          Value: !Sub ${Service}-demo-${DeploymentId}
+          Value: !Sub ${Service}-asg-${DeploymentId}
           PropagateAtLaunch: true
         - Key: Service
           Value: !Ref 'Service'
@@ -362,7 +357,7 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref 'DemoEcsCluster'
-      ServiceName: !Sub ${Service}-demo-${DeploymentId}
+      ServiceName: !Sub ${Service}-service-${DeploymentId}
       DesiredCount: 2
       DeploymentConfiguration:
         MaximumPercent: 100
@@ -373,13 +368,13 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       TaskRoleArn: !ImportValue 'DemoEcsTaskRole'
-      Family: !Sub ${Service}-demo-${DeploymentId}
+      Family: !Sub ${Service}-task-${DeploymentId}
       Volumes:
       - Host:
           SourcePath: /var/log
         Name: var-log
       ContainerDefinitions:
-      - Name: !Sub ${Service}-demo-${DeploymentId}
+      - Name: !Sub ${Service}-task-${DeploymentId}
         Essential: true
         Image: !Ref 'DemoAppImageUrl'
         MemoryReservation: '1000'
@@ -440,7 +435,7 @@ Resources:
       - !ImportValue 'DemoSnsTopic'
       Dimensions:
       - Name: ServiceName
-        Value: !Sub ${Service}-demo-${DeploymentId}
+        Value: !Sub ${Service}-alarm-${DeploymentId}
       - Name: ClusterName
         Value: !Ref 'DemoEcsCluster'
       ComparisonOperator: GreaterThanOrEqualToThreshold
@@ -450,7 +445,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Sub ${Service}-demo-${DeploymentId}
+      BucketName: !Sub ${Service}-bucket-${DeploymentId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
         - ServerSideEncryptionByDefault:
