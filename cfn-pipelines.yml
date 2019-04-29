@@ -1,11 +1,9 @@
-# AWS CLI deployment command
-# Execute the following command from the cfn directory:
 # aws --profile capstone cloudformation create-stack --stack-name cfn-pipelines-us-east-1-cis --template-body file://capstone-cfn/cfn-pipelines.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates CodePipeline CloudFromation deployments for the CIS-5898 Capstone project.
+  This template creates a CodePipeline CloudFormation deployment.
 
 Parameters:
   DeploymentId:
