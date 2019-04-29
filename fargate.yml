@@ -32,7 +32,7 @@ Resources:
   DemoEcsCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub ${Service}-demo-${DeploymentId}
+      ClusterName: !Sub ${Service}-ecs-${DeploymentId}
 
 # Demo Service
   DemoService:
@@ -64,7 +64,7 @@ Resources:
       ExecutionRoleArn: !ImportValue 'DemoEcsExecutionRole'
       TaskRoleArn: !ImportValue 'DemoEcsTaskRole'
       ContainerDefinitions:
-      - Name: !Sub ${Service}-demo-${DeploymentId}
+      - Name: !Sub ${Service}-task-${DeploymentId}
         Image: !Ref 'DemoImageUrl'
         Environment:
           - Name: AWS_ACCOUNT

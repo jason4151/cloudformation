@@ -3,7 +3,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a RDS MySQL Database.
+  This template creates a RDS MySQL Database and also utilizes Secrets Manager.
 
 Parameters:
   DeploymentId:
