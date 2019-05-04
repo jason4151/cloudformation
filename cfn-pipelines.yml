@@ -51,7 +51,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
+      BucketName: !Join ['', [ demo, -, !Ref 'Service', -, !Ref 'AWS::Region']]
 
 ### CodePipeline ###
   WebServerCfnCodePipeline:
