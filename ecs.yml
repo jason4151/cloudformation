@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --stack-name ecs-cluster-us-east-1-demo --template-body file://ecs.yml --parameters file://params/ecs-params-us-east-1-demo.json
+# aws cloudformation create-stack --stack-name ecs-cluster-us-east-1-demo --template-body file://ecs.yml --parameters file://params/ecs-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

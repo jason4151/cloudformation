@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://salt-master.yml
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://salt-master.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
@@ -14,6 +14,7 @@ Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: EC2 KeyPair to enable SSH access to the ECS instances.
+    Default: demo
 
   InstanceType:
     Description: EC2 instance type
@@ -23,6 +24,7 @@ Parameters:
   HostedZoneInternalName:
     Type: String
     Description: Route53 DNS Hosted Zone Internal Name.
+    Default: moskowitz.int.
 
   Service:
     Type: String
@@ -32,6 +34,7 @@ Parameters:
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
+    Default: jason@moskowitz.sh
 
   AmiId:
     Type: String
@@ -102,7 +105,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Join ['', [ capstone, -, !Ref 'Service', -, !Ref 'AWS::Region']]
+      BucketName: !Join ['', [ demo, -, !Ref 'Service', -, !Ref 'AWS::Region']]
       VersioningConfiguration:
         Status: Enabled
 

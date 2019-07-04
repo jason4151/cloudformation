@@ -1,5 +1,5 @@
-# aws --profile demo iam create-service-linked-role --aws-service-name es.amazonaws.com
-# aws --profile demo cloudformation create-stack --stack-name services-using-kms-us-east-1-demo --template-body file://services-using-kms.yml --parameters file://params/services-using-kms-params-us-east-1-demo.json
+# aws iam create-service-linked-role --aws-service-name es.amazonaws.com
+# aws cloudformation create-stack --stack-name services-using-kms-us-east-1-demo --template-body file://services-using-kms.yml --parameters file://params/services-using-kms-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

@@ -1,13 +1,13 @@
 # Production Stack:
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-prod-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-prod-params-us-east-1-demo.json
 #
 # Test Stack:
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-test-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-test-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a Web Server EC2 instance for the CIS-5898 Capstone project.
+  This template creates a Web Server (Apache) EC2 instance.
 
 Parameters:
   DeploymentId:
@@ -55,7 +55,7 @@ Parameters:
   GitHubRepository:
     Type: String
     Description: GitHub Repository
-    Default: demo-app
+    Default: php-crud-rds
 
   GitHubBranch:
     Type: String

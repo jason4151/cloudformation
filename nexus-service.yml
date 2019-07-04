@@ -1,3 +1,5 @@
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name nexus-service-us-east-1-demo --template-body file://nexus-service.yml --parameters file://params/nexus-service-params-us-east-1-demo.json
+
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >

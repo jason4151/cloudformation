@@ -1,4 +1,4 @@
-# aws --profile demo cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-cis --template-body file://linux-bastion.yml
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-demo --template-body file://linux-bastion.yml
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
@@ -23,6 +23,7 @@ Parameters:
   HostedZoneName:
     Type: String
     Description: Route53 DNS Hosted Zone Name.
+    Default: moskowitz.int.
 
   Service:
     Type: String
@@ -32,6 +33,7 @@ Parameters:
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
+    Default: jason@moskowitz.sh
 
   AmiId:
     Type: String

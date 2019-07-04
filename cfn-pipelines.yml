@@ -1,4 +1,4 @@
-# aws --profile capstone cloudformation create-stack --stack-name cfn-pipelines-us-east-1-cis --template-body file://capstone-cfn/cfn-pipelines.yml
+# aws cloudformation create-stack --stack-name cfn-pipelines-us-east-1-demo --template-body file://cfn-pipelines.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
