@@ -27,6 +27,7 @@ The `kms-service-config.yml` template demonstrates the configuration of a number
 ### EC2
 
 ### ECS
+The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate "Serverless" deployment using an example application.
 
 ## Developer Tools
 ### CodePipeline
