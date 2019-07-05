@@ -15,7 +15,7 @@ Parameters:
     ConstraintDescription: 1 to 30 lower case alphanumeric characters.
     Default: vpc-19-us-east-1-demo
 
-  SupernetNumber:
+  SecondOctetNumber:
     Description: The value for the second octet 10.x.0.0/24.
     Type: Number
     MinValue: '10'
@@ -43,7 +43,7 @@ Resources:
   Vpc:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.0/24]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.0/24]]
       EnableDnsHostnames: true
       EnableDnsSupport: true
       InstanceTenancy: default
@@ -71,7 +71,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.0/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.0/27]]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Service
@@ -86,7 +86,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.32/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.32/27]]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Service
@@ -102,7 +102,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.64/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.64/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -116,7 +116,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.96/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.96/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -131,7 +131,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.128/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.128/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -145,7 +145,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.160/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.160/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -160,7 +160,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.192/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.192/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -174,7 +174,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       VpcId: !Ref 'Vpc'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.224/27]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.224/27]]
       Tags:
         - Key: Service
           Value: infra
@@ -622,7 +622,7 @@ Resources:
       Protocol: '-1'
       RuleAction: allow
       Egress: 'false'
-      CidrBlock: !Join ['', ['10.', !Ref 'SupernetNumber', .0.0/16]]
+      CidrBlock: !Join ['', ['10.', !Ref 'SecondOctetNumber', .0.0/16]]
 
   InboundAllTrafficMgmtNetworkAclEntry:
     Type: AWS::EC2::NetworkAclEntry
