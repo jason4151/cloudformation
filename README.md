@@ -50,7 +50,7 @@ The Demo Web application uses a combination of the following templates:
 ![Demo Web App](https://www.lucidchart.com/publicSegments/view/d0c7a8ae-312e-4810-9101-95e95471aeb9/image.png)
 
 ### ECS
-The `ecs.yml` template creates an Amazon ECS cluster with auto scaling policies for a containerized application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using a containerized application. The `ecr.yml` demonstrates the configuration of an Docker image repository.
+The `ecs.yml` template creates an Amazon ECS cluster with auto scaling policies for a containerized application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using a containerized application. The `ecr.yml` demonstrates the configuration of an Docker image repository with am IAM cross account access role. This allows other AWS accounts to access the repository.
 
 ### RDS
 The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
