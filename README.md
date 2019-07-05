@@ -25,7 +25,13 @@ The `kms-service-config.yml` template demonstrates the configuration of a number
 
 ## Compute
 ### EC2
-Templates prefaced with `ec2` create the respective service utilizing an EC2 instance.
+Templates prefaced with `ec2` create the respective service utilizing an EC2 instance. Additional services utilized within these templates:
+* IAM
+* S3
+* CodeDeploy
+* CodePipeline
+* Secrets Manager
+* Route 53
 
 ### ECS
 The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using an example application.
