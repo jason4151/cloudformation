@@ -53,5 +53,5 @@ Resources:
 
 Outputs:
   DemoDockerAppRepo:
-    Description: ECR repository for Demo Docker Base Java
+    Description: ECR repository for Demo Docker App
     Value: !Ref 'DemoDockerAppRepo'
