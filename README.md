@@ -18,7 +18,7 @@ The deployment and maintenance of application code is done through the use of Co
 
 ## Security, Identity, & Compliance
 ### KMS
-The `kms-service-config.yml` template demonstrates the configuration of a number of AWS services with encryption at rest using KMS:
+The `kms-service-config.yml` template demonstrates the deployment configuration of a number of AWS services with encryption at rest using KMS:
 * DynamoDB
 * Elasticsearch
 * EMR
