@@ -25,12 +25,14 @@ The `kms-service-config.yml` template demonstrates the configuration of a number
 
 ## Compute
 ### EC2
+Templates prefaced with `ec2` create the respective service utilizing an EC2 instance.
 
 ### ECS
-The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate "Serverless" deployment using an example application.
+The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using an example application.
 
 ## Database
 ### RDS
+The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
 
 ## Developer Tools
 ### CodePipeline
