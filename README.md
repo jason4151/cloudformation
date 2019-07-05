@@ -17,7 +17,7 @@ Any service requiring inbound internet access to a front-end service, should be 
 #### Deployment
 `aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml`
 
-![VPC Diagram](https://www.lucidchart.com/publicSegments/view/8131766d-ceeb-4ca5-af5d-36ea8e7e14dd/image.png)
+![VPC Diagram](https://www.lucidchart.com/publicSegments/view/8017025b-b0a9-482f-819b-bd624e94c120/image.png)
 
 ## Developer Tools
 ### CodeDeploy & CodePipeline
