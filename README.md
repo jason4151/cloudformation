@@ -1,8 +1,7 @@
 # CloudFormation
 AWS CloudFormation templates used as a starting point for deploying an assortment of services.
 
-## Networking & Content Delivery
-### VPC
+## VPC
 The example VPC `vpc.yml` template is comprised of a 10.x.0.0/24 primary CIDR block, giving 256 private IP addresses. This address space is then divided into eight 10.x.0.0/27 subnets, each with 32 private IP addresses (5 of which are automatically reserved by AWS). A unique "Supernet" number (second octet) is chosen for each deployment which will allow for VPC peering and routing between subnets should the need ever arise.
 
 To facilitate high availability and service isolation, each VPC is contains 2 subnets of each type spanning two Availability Zones (AZs). There are 2 Public (internet-facing) subnets containing 1 NAT Gateway each, 2 Management (private) subnets, 2 Product (private) & 2 Database (private) Subnets.
@@ -17,14 +16,13 @@ Any service requiring inbound internet access to a front-end service, should be 
 #### Deployment
 `aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml`
 
+### VPC Diagram
 ![VPC Diagram](https://www.lucidchart.com/publicSegments/view/8017025b-b0a9-482f-819b-bd624e94c120/image.png)
 
-## Developer Tools
-### CodeDeploy & CodePipeline
+## CodeDeploy & CodePipeline
 The deployment and maintenance of application code is done through the use of CodeDeploy and the method for triggering the CodeDeploy job is done through the use of CodePipeline. For example, the GitHub repository for the demo web application [php-crud-rds](https://github.com/jason4151/php-crud-rds) uses two branches, master and test. The master branch corresponds to production code and deployments and the test branch corresponds to test code and deployments. Each of these branches is linked to their own EC2 instance, CodeDeploy job and CodePipeline configuration within AWS. The CodeDeploy and CodePipeline configuration is defined in the CloudFormation template `ec2-web-server.yml`.
 
-## Security, Identity, & Compliance
-### KMS
+## KMS
 The `kms-service-config.yml` template, while not deployable itself, demonstrates a working configuration for a number of AWS services with encryption at rest using KMS:
 * DynamoDB
 * Elasticsearch
@@ -33,8 +31,7 @@ The `kms-service-config.yml` template, while not deployable itself, demonstrates
 * S3
 * SQS
 
-## Compute
-### EC2
+## EC2
 Templates named `ec2-*.yml` create the respective service utilizing an EC2 instance. Additional AWS services utilized within these templates:
 * IAM
 * S3
@@ -43,11 +40,11 @@ Templates named `ec2-*.yml` create the respective service utilizing an EC2 insta
 * Secrets Manager
 * Route 53
 
+### Demo Application Diagram
 ![Demo Web App](https://www.lucidchart.com/publicSegments/view/d0c7a8ae-312e-4810-9101-95e95471aeb9/image.png)
 
 ### ECS
 The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using an example application.
 
-## Database
 ### RDS
 The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
