@@ -24,7 +24,7 @@ The `kms-service-config.yml` template demonstrates the configuration of a number
 
 ## Compute
 ### EC2
-Templates prefaced with `ec2` create the respective service utilizing an EC2 instance. Additional services utilized within these templates:
+Templates named `ec2-*.yml` create the respective service utilizing an EC2 instance. Additional AWS services utilized within these templates:
 * IAM
 * S3
 * CodeDeploy
