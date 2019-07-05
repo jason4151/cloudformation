@@ -19,7 +19,6 @@ The `kms-service-config.yml` template demonstrates the configuration of a number
 * Elasticsearch
 * EMR
 * Kinesis
-* KMS
 * S3
 * SQS
 
