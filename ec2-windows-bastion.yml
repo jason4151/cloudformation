@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name windows-bastion-us-east-1-demo --template-body file://windows-bastion.yml --parameters file://params/windows-bastion-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name windows-bastion-us-east-1-demo --template-body file://ec2-windows-bastion.yml --parameters file://params/windows-bastion-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

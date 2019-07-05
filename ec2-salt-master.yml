@@ -1,13 +1,9 @@
-# Production Stack:
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-prod-params-us-east-1-demo.json
-#
-# Test Stack:
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://web-server.yml --parameters file://params/web-server-test-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://ec2-salt-master.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a Web Server (Apache) EC2 instance.
+  This template creates a Salt Master EC2 instance.
 
 Parameters:
   DeploymentId:
@@ -25,22 +21,20 @@ Parameters:
     Type: String
     Default: t2.micro
 
-  HostedZoneName:
-    Type: String
-    Description: Route53 DNS Hosted Zone Name.
-    
   HostedZoneInternalName:
     Type: String
-    Description: Route53 DNS Hosted Zone Name.
+    Description: Route53 DNS Hosted Zone Internal Name.
+    Default: moskowitz.int.
 
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
-    Default: web-server
+    Default: salt-master
 
   Owner:
     Type: String
     Description: Email address of the person that created the stack.
+    Default: jason@moskowitz.sh
 
   AmiId:
     Type: String
@@ -55,7 +49,7 @@ Parameters:
   GitHubRepository:
     Type: String
     Description: GitHub Repository
-    Default: php-crud-rds
+    Default: salt
 
   GitHubBranch:
     Type: String
@@ -65,15 +59,15 @@ Parameters:
 # The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
 ### EC2 ###
-  WebServerEc2Instance:
+  SaltMasterEc2Instance:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref 'AmiId'
       InstanceType: !Ref 'InstanceType'
-      SubnetId: !ImportValue 'PublicSubnetAz1'
+      SubnetId: !ImportValue 'MgmtSubnetAz1'
       KeyName: !Ref 'KeyName'
-      SecurityGroupIds: [!Ref 'WebServerEc2SecurityGroup']
-      IamInstanceProfile: !Ref 'WebServerInstanceProfile'
+      SecurityGroupIds: [!Ref 'SaltMasterEc2SecurityGroup']
+      IamInstanceProfile: !Ref 'SaltMasterInstanceProfile'
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
@@ -96,27 +90,18 @@ Resources:
             yum -y install ruby
             ./install auto
             yum install -y aws-cfn-bootstrap
-            # Install Salt Minion and set system role
+            # Install Salt Master
             yum install -y https://repo.saltstack.com/yum/amazon/salt-amzn2-repo-latest.amzn2.noarch.rpm
-            yum clean expire-cache
-            yum install -y salt-minion
-            systemctl enable salt-minion.service
-            echo 'role: web-server' >> /etc/salt/grains
-            systemctl start salt-minion.service
-            salt-call state.highstate
+            yum install -y salt-master
+            systemctl enable salt-master.service
+            echo 'role: salt-master' >> /etc/salt/grains
+            systemctl start salt-master.service
             # Send CloudFormation Signals
-            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerEc2Instance --region ${AWS::Region}
-
-### EC2 EIP ###
-  WebServerEc2Eip:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      InstanceId: !Ref 'WebServerEc2Instance'
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource SaltMasterEc2Instance --region ${AWS::Region}
 
 ### S3 ###
-  WebServerS3Bucket:
+  SaltMasterS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
@@ -125,16 +110,16 @@ Resources:
         Status: Enabled
 
 ### CodeDeploy ###
-  WebServerCodeDeployApplication:
+  SaltMasterCodeDeployApplication:
     Type: AWS::CodeDeploy::Application
     Properties:
       ApplicationName: !Sub ${Service}-${DeploymentId}	    
       ComputePlatform: Server
 
-  WebServerCodeDeployDeploymentGroup: 
+  SaltMasterCodeDeployDeploymentGroup: 
     Type: AWS::CodeDeploy::DeploymentGroup
     Properties: 
-      ApplicationName: !Ref 'WebServerCodeDeployApplication'
+      ApplicationName: !Ref 'SaltMasterCodeDeployApplication'
       AutoRollbackConfiguration:
         Enabled: 'true'
         Events:
@@ -144,14 +129,14 @@ Resources:
           Value: !Ref 'Service'
           Type: KEY_AND_VALUE
       ServiceRoleArn: 
-        Fn::GetAtt: [ WebServerRole, Arn ]  
+        Fn::GetAtt: [ SaltMasterRole, Arn ]  
 
 ### CodePipeline ###
-  WebServerCodePipeline:
+  SaltMasterCodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: !Sub ${Service}-code-${DeploymentId}
-      RoleArn: !GetAtt [WebServerCodePipelineRole, Arn]
+      RoleArn: !GetAtt [SaltMasterCodePipelineRole, Arn]
       Stages:
       - Name: Source
         Actions:
@@ -181,84 +166,73 @@ Resources:
           InputArtifacts:
           - Name: SourceArtifact
           Configuration:
-            ApplicationName: !Ref 'WebServerCodeDeployApplication'
-            DeploymentGroupName: !Ref 'WebServerCodeDeployDeploymentGroup'
+            ApplicationName: !Ref 'SaltMasterCodeDeployApplication'
+            DeploymentGroupName: !Ref 'SaltMasterCodeDeployDeploymentGroup'
           RunOrder: 2
       ArtifactStore:
         Type: S3
-        Location: !Ref 'WebServerS3Bucket'
+        Location: !Ref 'SaltMasterS3Bucket'
 
 ### Route 53 ###
-  WebServerDnsRecord:
+  SaltMasterInternalDnsRecord:
     Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneName: !Ref 'HostedZoneName'
-      Comment: DNS name for Web Server instance.
-      Name: !Join ['', [!Ref 'Service', -, !Ref 'DeploymentId', ., !Ref 'HostedZoneName']]
-      Type: A
-      TTL: '300'
-      ResourceRecords:
-      - !Ref 'WebServerEc2Eip'
-
-  WebServerInternalDnsRecord:
-    Type: AWS::Route53::RecordSet
-    DependsOn: WebServerEc2Instance
+    DependsOn: SaltMasterEc2Instance
     Properties:
       HostedZoneName: !Ref 'HostedZoneInternalName'
-      Comment: DNS name for WebServer instance.
-      Name: !Join ['', [!Ref 'Service', -, !Ref 'DeploymentId', ., !Ref 'HostedZoneInternalName']]
+      Comment: DNS name for SaltMaster instance.
+      Name: !Join ['', [salt, ., !Ref 'HostedZoneInternalName']]
       Type: CNAME
       TTL: '300'
       ResourceRecords:
-      - !GetAtt WebServerEc2Instance.PrivateDnsName
+      - !GetAtt SaltMasterEc2Instance.PrivateDnsName
 
 ### Security Groups ###
-  WebServerEc2SecurityGroup:
+  SaltMasterEc2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: WebServer Security Group
+      GroupDescription: SaltMaster Security Group
       VpcId: !ImportValue 'VpcId'
       Tags:
         - Key: Service
-          Value: WebServer
+          Value: salt-master
         - Key: Name
-          Value: web-server-ec2-sg
+          Value: salt-master-ec2-sg
 
-# Allow Web port 80 access to WebServer EC2 instance from VPC addresses
-  WebServerEc2SecurityGroup80inbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: VPC Access Port 80
-      GroupId: !Ref 'WebServerEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '80'
-      ToPort: '80'
-      CidrIp: 10.19.0.0/24
-
-# Allow Web port 80 access to WebServer EC2 instance from Specific IP address
-  WebServerEc2SecurityGroup80FitInbound:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Specfic Access Port 80
-      GroupId: !Ref 'WebServerEc2SecurityGroup'
-      IpProtocol: tcp
-      FromPort: '80'
-      ToPort: '80'
-      CidrIp: 5.5.5.5/32
-
-# Allow SSH port 22 access to WebServer EC2 instance from VPC addresses
-  WebServerEc2SecurityGroupSshInbound:
+# Allow SSH port 22 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroupSshInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       Description: VPC Access Port 22
-      GroupId: !Ref 'WebServerEc2SecurityGroup'
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '22'
       ToPort: '22'
       CidrIp: 10.19.0.0/24
 
+# Allow port 4505 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroup4505Inbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: VPC Access Port 4505
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '4505'
+      ToPort: '4505'
+      CidrIp: 10.19.0.0/24
+
+# Allow port 4506 access to Salt Master EC2 instance from VPC addresses
+  SaltMasterEc2SecurityGroup4505Inbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: VPC Access Port 4506
+      GroupId: !Ref 'SaltMasterEc2SecurityGroup'
+      IpProtocol: tcp
+      FromPort: '4506'
+      ToPort: '4506'
+      CidrIp: 10.19.0.0/24
+
 ### IAM Role & Policies ###
-  WebServerRole:
+  SaltMasterRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -273,28 +247,28 @@ Resources:
                 - sts:AssumeRole
       Path: /
 
-# Allow Web Server service access to S3 Bucket
-  WebServerS3AccessPolicy:
+# Allow Salt Master service access to S3 Bucket
+  SaltMasterS3AccessPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WebServerS3AccessPolicy
+      PolicyName: SaltMasterS3AccessPolicy
       Roles:
-        - !Ref 'WebServerRole'
+        - !Ref 'SaltMasterRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Action:
               - s3:*
-            Resource: !Sub 'arn:aws:s3:::${WebServerS3Bucket}/*'
+            Resource: !Sub 'arn:aws:s3:::${SaltMasterS3Bucket}/*'
 
-# Allow Web Server service access to Assume IAM roles
-  WebServerAssumeRolePolicy:
+# Allow Salt Master service access to Assume IAM roles
+  SaltMasterAssumeRolePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WebServerAssumeRolePolicy
+      PolicyName: SaltMasterAssumeRolePolicy
       Roles:
-        - !Ref 'WebServerRole'
+        - !Ref 'SaltMasterRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -304,13 +278,13 @@ Resources:
             Resource:
               - '*'
 
-# Allow Web Server service access to CloudWatch
-  WebServerCloudWatchPolicy:
+# Allow Salt Master service access to CloudWatch
+  SaltMasterCloudWatchPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WebServerCloudWatchPolicy
+      PolicyName: SaltMasterCloudWatchPolicy
       Roles:
-        - !Ref 'WebServerRole'
+        - !Ref 'SaltMasterRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -321,13 +295,13 @@ Resources:
               - cloudwatch:PutMetricData
             Resource: '*'
 
-# Allow CodeDeploy service to perform actions on Web Server 
-  WebServerCodeDeployPolicy:
+# Allow CodeDeploy service to perforam actions on Salt Master 
+  SaltMasterCodeDeployPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: WebServerCodeDeployPolicy
+      PolicyName: SaltMasterCodeDeployPolicy
       Roles:
-        - !Ref 'WebServerRole'
+        - !Ref 'SaltMasterRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -342,8 +316,16 @@ Resources:
             Resource:
               - '*'
 
-# Allow CodePipeline service to peform actions on Web Server
-  WebServerCodePipelineRole:
+# Salt Master EC2 Instance profile for which the Salt Master IAM role is associated
+  SaltMasterInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'SaltMasterRole'
+
+# Allow CodePipeline service to peform actions on Salt Master
+  SaltMasterCodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -356,7 +338,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       Policies:
-      - PolicyName: WebServerCodePipelinePolicy
+      - PolicyName: SaltMasterCodePipelinePolicy
         PolicyDocument:
           Statement:
           - Action:
@@ -382,14 +364,6 @@ Resources:
             Effect: Allow
           Version: '2012-10-17'
 
-# Web Server EC2 Instance profile for which the Web Server IAM role is associated
-  WebServerInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: /
-      Roles:
-        - !Ref 'WebServerRole'
-
 Outputs:
-  WebServerEc2InstancePrivateDnsName:
-     Value: !GetAtt WebServerEc2Instance.PrivateDnsName
+  SaltMasterEc2InstancePrivateDnsName:
+     Value: !GetAtt SaltMasterEc2Instance.PrivateDnsName

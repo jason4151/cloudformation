@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --stack-name cfn-pipelines-us-east-1-demo --template-body file://cfn-pipelines.yml
+# aws cloudformation create-stack --stack-name codepipeline-cfn-us-east-1-demo --template-body file://codepipeline-cfn.yml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
