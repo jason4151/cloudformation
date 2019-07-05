@@ -3,7 +3,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates ECR Docker image repositories.
+  This template creates ECR Docker image repositories with an IAM cross account access role.
 
 Resources:
 ### IAM ###
@@ -37,8 +37,8 @@ Resources:
           Effect: Allow
           Principal:
             AWS:
-              - arn:aws:iam::192484846854:root
-              - arn:aws:iam::027586393184:root
+              - arn:aws:iam::<AWS ACCOUNT NUMBER 1>:root
+              - arn:aws:iam::<AWS ACCOUNT NUMBER 1>:root
               - !GetAtt [DemoEcrCrossAccountAccessRole, Arn]
           Action:
           - ecr:GetDownloadUrlForLayer
