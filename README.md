@@ -7,4 +7,8 @@ The example VPC is comprised of a 10.x.0.0/24 primary CIDR block, giving 256 pri
 
 To facilitate high availability and service isolation, each VPC is contains 2 subnets of each type spanning two Availability Zones (AZs). There are 2 Public (internet-facing) subnets containing 1 NAT Gateway each, 2 Management (private) subnets, 2 Product (private) & 2 Database (private) Subnets. The management subnet is intended for internally used services, e.g., Active Directory, Jenkins, Nexus, etc. The product subnet is intended for product (demo) deployments. The database subnet is intended for RDS, Redshift, etc. Any service requiring inbound internet access to a front-end service, should be configured to use a Load Balancer deployed into the Public Subnets. All outbound internet traffic is routed through one of the NAT Gateway devices in the respective AZ. A VPC Endpoint is also configured to allow certain types of traffic to stay within the VPC instead of traversing the internet, S3 being an example of this.
 
+### Deployment
+`aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml`
+
 ![VPC Diagram](https://www.lucidchart.com/publicSegments/view/8131766d-ceeb-4ca5-af5d-36ea8e7e14dd/image.png)
+
