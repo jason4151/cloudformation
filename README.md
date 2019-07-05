@@ -32,7 +32,7 @@ The `kms-service-config.yml` template, while not deployable itself, demonstrates
 * SQS
 
 ## EC2
-Templates named `ec2-*.yml` deploy the respective service as named utilizing an EC2 instance. Additional AWS services utilized within these templates are as follows:
+Templates named `ec2-*.yml` deploy the specified service utilizing an EC2 instance. Additional AWS services utilized within these templates are as follows:
 * IAM
 * S3
 * CodeDeploy
