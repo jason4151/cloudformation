@@ -40,5 +40,5 @@ The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an ap
 The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
 
 ## Developer Tools
-### CodePipeline
+### CodePipeline & CodeDeploy
 The deployment and maintenance of application code is done through the use of CodeDeploy and the method for triggering the CodeDeploy job is done through the use of CodePipeline. For example, the GitHub repository for the demo web application [php-crud-rds](https://github.com/jason4151/php-crud-rds) uses two branches, master and test. The master branch corresponds to production code and deployments and the test branch corresponds to test code and deployments. Each of these branches is linked to their own EC2 instance, CodeDeploy job and CodePipeline configuration within AWS. The CodeDeploy and CodePipeline configuration is defined in the CloudFormation template `ec2-web-server.yml`.
