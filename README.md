@@ -43,6 +43,8 @@ Templates named `ec2-*.yml` create the respective service utilizing an EC2 insta
 * Secrets Manager
 * Route 53
 
+![Demo Web App](https://www.lucidchart.com/publicSegments/view/d0c7a8ae-312e-4810-9101-95e95471aeb9/image.png)
+
 ### ECS
 The `ecs.yml` template creates an Amazon ECS cluster with auto scaling for an application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using an example application.
 
