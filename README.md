@@ -51,6 +51,9 @@ The Demo Web application uses a combination of the following templates:
 
 ### ECS
 The `ecs.yml` template creates an Amazon ECS cluster with auto scaling policies for a containerized application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using a containerized application. The `ecr.yml` demonstrates the configuration of an Docker image repository with am IAM cross account access role. This allows other AWS accounts to access the repository.
+
+### ECS Example Application Diagram
+This diagram depicts an example ECS application deployment.
 ![ECS Example App](https://www.lucidchart.com/publicSegments/view/31db8182-a28c-486b-8d1f-803a5e6d89be/image.png)
 
 ### RDS
