@@ -57,4 +57,4 @@ This diagram depicts an example ECS application deployment.
 ![ECS Example App](https://www.lucidchart.com/publicSegments/view/31db8182-a28c-486b-8d1f-803a5e6d89be/image.png)
 
 ### RDS
-The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
+The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in serverless mode. Using RDS serverless removes the complexity of managing database instances and capacity. The database will automatically start up, shut down, and scale to match the needs of the application. AWS only charges for the database resources consumed, on a per-second basis. In other words, you don't pay for the database instance unless it's actually running. In contrast, the `rds-mysql.yml` template creates a single RDS MySQL Database instance which you will be charged for as long as the instance is running. Both templates utilize Secrets Manager for generating the database admin user password.
