@@ -239,7 +239,7 @@ Resources:
   WebServerEc2SecurityGroup80FitInbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Specfic Access Port 80
+      Description: Specific Access Port 80
       GroupId: !Ref 'WebServerEc2SecurityGroup'
       IpProtocol: tcp
       FromPort: '80'
