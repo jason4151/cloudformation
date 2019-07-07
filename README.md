@@ -32,7 +32,7 @@ The `kms-service-config.yml` template, while not deployable itself, demonstrates
 * SQS
 
 ## EC2
-Templates named `ec2-*.yml` deploy the respective service as named utilizing an EC2 instance. Additional AWS services utilized within these templates are as follows:
+Templates named `ec2-*.yml` deploy the specified service utilizing an EC2 instance. Additional AWS services utilized within these templates are as follows:
 * IAM
 * S3
 * CodeDeploy
@@ -50,7 +50,11 @@ The Demo Web application uses a combination of the following templates:
 ![Demo Web App](https://www.lucidchart.com/publicSegments/view/d0c7a8ae-312e-4810-9101-95e95471aeb9/image.png)
 
 ### ECS
-The `ecs.yml` template creates an Amazon ECS cluster with auto scaling policies for a containerized application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using a containerized application. The `ecr.yml` demonstrates the configuration of an Docker image repository.
+The `ecs.yml` template creates an Amazon ECS cluster with auto scaling policies for a containerized application. The `ecs-fargate.yml` template creates an ECS Fargate Serverless deployment using a containerized application. The `ecr.yml` demonstrates the configuration of an Docker image repository with am IAM cross account access role. This allows other AWS accounts to access the repository.
+
+### ECS Example Application Diagram
+This diagram depicts an example ECS application deployment.
+![ECS Example App](https://www.lucidchart.com/publicSegments/view/31db8182-a28c-486b-8d1f-803a5e6d89be/image.png)
 
 ### RDS
-The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in Serverless mode. The `rds-mysql.yml` template creates a single RDS MySQL Database instance. Both templates utilize Secrets Manager for generating the database admin user password.
+The `rds-aurora-mysql.yml` template creates a RDS Aurora MySQL Database cluster in serverless mode. Using RDS serverless removes the complexity of managing database instances and capacity. The database will automatically start up, shut down, and scale to match the needs of the application. AWS only charges for the database resources consumed, on a per-second basis. In other words, you don't pay for the database instance unless it's actually running. In contrast, the `rds-mysql.yml` template creates a single RDS MySQL Database instance which you will be charged for as long as the instance is running. Both templates utilize Secrets Manager for generating the database admin user password.
