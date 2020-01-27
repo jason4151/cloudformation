@@ -54,10 +54,10 @@ Templates named `ec2-*.yml` deploy the specified service utilizing an EC2 instan
 The Demo Web application uses a combination of the following templates:
 
 * `vpc.yml`
+* `rds-mysql.yml` or `rds-aurora-mysql.yml`
 * `ec2-linux-bastion.yml`
 * `ec2-salt-master.yml`
 * `ec2-web-server.yml`
-* `rds-mysql.yml` or `rds-aurora-mysql.yml`
 ![Demo Web App](https://www.lucidchart.com/publicSegments/view/d0c7a8ae-312e-4810-9101-95e95471aeb9/image.png)
 
 ### ECS
