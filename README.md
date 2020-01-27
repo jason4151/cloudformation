@@ -18,10 +18,6 @@ Any service requiring inbound internet access to a front-end service, should be 
 ### Deployment
 
 `aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml`
-`aws cloudformation create-stack --stack-name rds-aurora-mysql-us-east-1-demo --template-body file://rds-aurora-mysql.yml`
-`aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-demo --template-body file://ec2-linux-bastion.yml`
-`aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://ec2-salt-master.yml`
-`aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://ec2-web-server.yml --parameters file://params/web-server-test-params-us-east-1-demo.json`
 
 ### VPC Diagram
 
