@@ -1,8 +1,8 @@
 # Production Stack:
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://ec2-web-server.yml --parameters file://params/web-server-prod-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-prod-us-east-1-demo --template-body file://ec2-web-server.yaml --parameters file://params/web-server-prod-params-us-east-1-demo.json
 #
 # Test Stack:
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://ec2-web-server.yml --parameters file://params/web-server-test-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name web-server-test-us-east-1-demo --template-body file://ec2-web-server.yaml --parameters file://params/web-server-test-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

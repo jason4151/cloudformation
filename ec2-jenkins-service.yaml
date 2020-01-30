@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-service-us-east-1-demo --template-body file://ec2-jenkins-service.yml --parameters file://params/jenkins-service-params-us-east-1-demo.json
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name jenkins-service-us-east-1-demo --template-body file://ec2-jenkins-service.yaml --parameters file://params/jenkins-service-params-us-east-1-demo.json
 
 AWSTemplateFormatVersion: '2010-09-09'
 

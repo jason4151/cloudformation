@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yml
+# aws cloudformation create-stack --stack-name vpc-19-us-east-1-demo --template-body file://vpc.yaml
 
 AWSTemplateFormatVersion: '2010-09-09'
 

@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-demo --template-body file://ec2-linux-bastion.yml
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name linux-bastion-us-east-1-demo --template-body file://ec2-linux-bastion.yaml
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >

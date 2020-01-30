@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name ecr-us-east-1-demo --template-body file://ecr.yml
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name ecr-us-east-1-demo --template-body file://ecr.yaml
 
 AWSTemplateFormatVersion: '2010-09-09'
 

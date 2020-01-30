@@ -1,15 +1,15 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name rds-mysql-us-east-1-cis --template-body file://rds-mysql.yml
+# aws cloudformation create-stack --stack-name rds-aurora-mysql-us-east-1-demo --template-body file://rds-aurora-mysql.yaml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  This template creates a RDS MySQL Database.
+  This template creates a RDS Aurora MySQL Database (Serverless) and also utilizes Secrets Manager.
 
 Parameters:
   DeploymentId:
     Type: String
     Description: A unique deployment identifier.
-    Default: cis
+    Default: demo
 
   Owner:
     Type: String
@@ -19,21 +19,22 @@ Parameters:
   Service:
     Type: String
     Description: Name of the service or product that is associated with this stack.
-    Default: mysql
+    Default: aurora-mysql
 
-  RdsMySqlDatabaseName:
+  RdsAuroraMySqlDatabaseName:
     Type: String
     Description: RDS database name.
     Default: demo
 
-  RdsMySqlInstanceType:
+  RdsAuroraMySqlInstanceType:
     Description: RDS EC2 instance type
     Type: String
-    Default: db.t2.micro
+    Default: db.t2.small
 
+# The Resources section specifies the resources and their properties deployed in the stack.
 Resources:
-#### RDS MySQL Database ###
-  RdsMySqlSubnetGroup:
+### RDS Aurora MySQL Database ###
+  RdsAuroraMySqlSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: EES RDS Subnet Group
@@ -48,7 +49,7 @@ Resources:
         - Key: Owner
           Value: !Ref 'Owner'
 
-  RdsMySqlSecurityGroup:
+  RdsAuroraMySqlSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: RDS Security Group
@@ -61,34 +62,33 @@ Resources:
         - Key: Owner
           Value: !Ref 'Owner'
 
-  RdsMySqlSecurityGroup3306Inbound:
+  RdsAuroraMySqlSecurityGroup3306Inbound:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      GroupId: !Ref 'RdsMySqlSecurityGroup'
+      GroupId: !Ref 'RdsAuroraMySqlSecurityGroup'
       IpProtocol: tcp
       FromPort: '3306'
       ToPort: '3306'
       CidrIp: 10.19.0.0/24
 
-  RdsMySqlDbInstance:
-    Type: AWS::RDS::DBInstance
+  RdsAuroraMySqlDbCluster:
+    Type: AWS::RDS::DBCluster
     DeletionPolicy: Snapshot
     Properties:
-      AllocatedStorage: 20
-      DBInstanceClass: !Ref 'RdsMySqlInstanceType'
-      DBInstanceIdentifier: !Join ['-', [ !Ref 'Service', rds, !Ref 'AWS::Region', !Ref 'DeploymentId']]
-      DBName: !Ref 'RdsMySqlDatabaseName'
-      DBSubnetGroupName: !Ref 'RdsMySqlSubnetGroup'
-      Engine: mysql
-      EngineVersion: 5.6.40
-      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:username}}' ]]
-      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsMySqlDbSecret, ':SecretString:password}}' ]]      
-      MultiAZ: true
-      PreferredBackupWindow: 06:00-06:30
-      PreferredMaintenanceWindow: Wed:07:00-Wed:08:00
-      PubliclyAccessible: false
-      StorageEncrypted: false
-      StorageType: gp2
+      DatabaseName: !Ref 'RdsAuroraMySqlDatabaseName'
+      DBClusterIdentifier: !Join ['-', [ !Ref 'Service', rds, !Ref 'AWS::Region', !Ref 'DeploymentId']]
+      DBSubnetGroupName: !Ref 'RdsAuroraMySqlSubnetGroup'
+      Engine: aurora
+      EngineMode: serverless
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsAuroraMySqlDbSecret, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RdsAuroraMySqlDbSecret, ':SecretString:password}}' ]]      
+      BackupRetentionPeriod: 7
+      StorageEncrypted: true
+      ScalingConfiguration:
+        AutoPause: true
+        MaxCapacity: 2
+        MinCapacity: 1
+        SecondsUntilAutoPause: 300
       Tags:
         - Key: Name
           Value: !Sub rds-${Service}-${DeploymentId}
@@ -96,11 +96,11 @@ Resources:
           Value: !Ref 'Service'
         - Key: Owner
           Value: !Ref 'Owner'
-      VPCSecurityGroups:
-        - !Ref 'RdsMySqlSecurityGroup'
+      VpcSecurityGroupIds:
+        - !Ref 'RdsAuroraMySqlSecurityGroup'
 
 ### Secrets Manager ###
-  RdsMySqlDbSecret:
+  RdsAuroraMySqlDbSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: "Dynamically generated secret password."
@@ -111,7 +111,7 @@ Resources:
         ExcludeCharacters: '"@/\'
       Tags:
         - Key: Name
-          Value: !Sub !Sub rds-${Service}-${DeploymentId}
+          Value: !Sub rds-${Service}-${DeploymentId}
         - Key: Service
           Value: !Ref 'Service'
         - Key: Owner
@@ -120,19 +120,19 @@ Resources:
   SecretRDSInstanceAttachment:
     Type: AWS::SecretsManager::SecretTargetAttachment
     Properties:
-      SecretId: !Ref RdsMySqlDbSecret
-      TargetId: !Ref RdsMySqlDbInstance
-      TargetType: AWS::RDS::DBInstance
+      SecretId: !Ref RdsAuroraMySqlDbSecret
+      TargetId: !Ref RdsAuroraMySqlDbCluster
+      TargetType: AWS::RDS::DBCluster
 
 Outputs:
-  RdsMySqlDbInstanceUrl:
-    Description: RDS MySQL Database URL
-    Value: !GetAtt [RdsMySqlDbInstance, Endpoint.Address]
+  RdsAuroraMySqlDbClusterUrl:
+    Description: RDS Aurora MySQL Database URL
+    Value: !GetAtt [RdsAuroraMySqlDbCluster, Endpoint.Address]
     Export:
-      Name: RdsMySqlDbInstanceUrl
+      Name: RdsAuroraMySqlDbClusterUrl
 
-  RdsMySqlDbName:
-    Description: RDS  Engine Database Name
-    Value: !Ref 'RdsMySqlDatabaseName'
+  RdsAuroraMySqlDbName:
+    Description: RDS Aurora MySQL Database Name
+    Value: !Ref 'RdsAuroraMySqlDatabaseName'
     Export:
-      Name: RdsMySqlDbName
+      Name: RdsAuroraMySqlDbName

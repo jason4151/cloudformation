@@ -1,4 +1,4 @@
-# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://ec2-salt-master.yml
+# aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name salt-master-us-east-1-demo --template-body file://ec2-salt-master.yaml
 
 AWSTemplateFormatVersion: '2010-09-09'
 
